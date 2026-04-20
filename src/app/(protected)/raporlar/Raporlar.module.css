@@ -59,3 +59,32 @@
   color: var(--text-secondary);
   padding: 2rem;
 }
+
+.searchableSelect {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.historyCard {
+  border: 1px solid var(--primary-light);
+  background: var(--surface);
+}
+
+.historyGridWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  margin-top: 0.5rem;
+}
+
+.historyGridWrapper table {
+  min-width: 600px;
+}

@@ -123,11 +123,36 @@ export async function getReportStats(filters: {
     };
   });
 
+  const prayerTimes = await prisma.prayerTime.findMany({
+    where: { institutionId: user.institutionId },
+    orderBy: { sortOrder: 'asc' }
+  });
+
+  // Öğrenci bazlı detaylı geçmiş (Matris yapısı)
+  let studentHistory: any = null;
+  if (filters.studentId && attendances.length > 0) {
+    const dates = Array.from(new Set(attendances.map(a => new Date(a.date).toISOString().split('T')[0])))
+      .sort((a,b) => new Date(b).getTime() - new Date(a).getTime()); // Yeniden eskiye
+
+    studentHistory = dates.map(dateStr => {
+      const dayData: any = { date: dateStr };
+      prayerTimes.forEach(p => {
+        const match = attendances.find(a => 
+          new Date(a.date).toISOString().split('T')[0] === dateStr && a.prayerTimeId === p.id
+        );
+        dayData[p.id] = match ? match.status : '-';
+      });
+      return dayData;
+    });
+  }
+
   return {
     pieData,
     trendData,
     totalRecords: attendances.length,
-    records: attendances
+    records: attendances,
+    studentHistory,
+    prayerTimes
   };
 }
 

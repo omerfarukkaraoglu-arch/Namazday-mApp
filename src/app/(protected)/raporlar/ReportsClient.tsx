@@ -42,10 +42,16 @@ export function ReportsClient({
     levelId: '',
     prayerTimeId: ''
   });
+  const [studentSearch, setStudentSearch] = useState('');
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
+
+  const filteredStudents = options.students.filter((s: any) => 
+    s.fullName.toLowerCase().includes(studentSearch.toLowerCase()) || 
+    s.studentNo.includes(studentSearch)
+  );
 
   const applyFilters = async () => {
     setLoading(true);
@@ -61,12 +67,16 @@ export function ReportsClient({
       case 'GEC': return <Badge variant="delay">GEÇ</Badge>;
       case 'IZINLI': return <Badge variant="warning">İZİNLİ</Badge>;
       case 'GOREVLI': return <Badge variant="info">GÖREVLİ</Badge>;
-      default: return <Badge>{status}</Badge>;
+      default: return <Badge variant="neutral">{status}</Badge>;
     }
   };
 
   const getExportTitle = () => {
     let title = 'Genel Yoklama Raporu';
+    if (filters.studentId) {
+      const student = options.students.find((s: any) => s.id === filters.studentId);
+      title = `${student?.fullName || 'Öğrenci'} - Bireysel Rapor`;
+    }
     if (filters.startDate || filters.endDate) {
       title += ` (${filters.startDate || '...'} / ${filters.endDate || '...'})`;
     }
@@ -96,19 +106,35 @@ export function ReportsClient({
       {/* Filtreleme Kartı */}
       <Card style={{ overflow: 'visible' }}>
         <CardContent>
-          <div className={styles.filtersGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', display: 'grid' }}>
+          <div className={styles.filtersGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', display: 'grid' }}>
             <div>
               <Input label="Başlangıç" type="date" value={filters.startDate} onChange={e => handleFilterChange('startDate', e.target.value)} />
             </div>
             <div>
               <Input label="Bitiş" type="date" value={filters.endDate} onChange={e => handleFilterChange('endDate', e.target.value)} />
             </div>
-            <div>
-              <Select label="Öğrenci" value={filters.studentId} onChange={e => handleFilterChange('studentId', e.target.value)}>
-                <option value="">Tümü</option>
-                {options.students.map((s: any) => <option key={s.id} value={s.id}>{s.fullName} ({s.class?.name || '?'})</option>)}
+            
+            <div className={styles.searchableSelect}>
+              <label className={styles.label}>Öğrenci Bul</label>
+              <Input 
+                placeholder="İsim veya No ile ara..." 
+                value={studentSearch} 
+                onChange={e => setStudentSearch(e.target.value)}
+                style={{ marginBottom: '0.25rem' }}
+              />
+              <Select 
+                value={filters.studentId} 
+                onChange={e => handleFilterChange('studentId', e.target.value)}
+              >
+                <option value="">Tümü ({options.students.length})</option>
+                {filteredStudents.map((s: any) => (
+                  <option key={s.id} value={s.id}>
+                    {s.fullName} ({s.class?.name || '?'})
+                  </option>
+                ))}
               </Select>
             </div>
+
             <div>
               <Select label="Sınıf" value={filters.classId} onChange={e => handleFilterChange('classId', e.target.value)} disabled={!!filters.studentId}>
                 <option value="">Tümü</option>
@@ -129,12 +155,46 @@ export function ReportsClient({
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>
               <Button style={{ flex: 1, height: '42px' }} onClick={applyFilters} disabled={loading}>
-                <Filter size={18} /> Filtrele
+                <Filter size={18} /> {loading ? 'Yükleniyor...' : 'Filtrele'}
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {stats.studentHistory && (
+        <Card className={styles.historyCard}>
+          <CardHeader>Öğrenci Devam Çizelgesi (Detaylı)</CardHeader>
+          <CardContent>
+            <div className={styles.historyGridWrapper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>Tarih</TableHeader>
+                    {stats.prayerTimes.map((p: any) => (
+                      <TableHeader key={p.id} style={{ textAlign: 'center' }}>{p.name}</TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {stats.studentHistory.map((day: any) => (
+                    <TableRow key={day.date}>
+                      <TableCell style={{ fontWeight: 600 }}>
+                        {new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', weekday: 'short' }).format(new Date(day.date))}
+                      </TableCell>
+                      {stats.prayerTimes.map((p: any) => (
+                        <TableCell key={p.id} style={{ textAlign: 'center' }}>
+                          {getStatusBadge(day[p.id])}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {stats.totalRecords === 0 ? (
         <Card>
