@@ -36,8 +36,9 @@ export function Sidebar({ isAdmin, isSystemAdmin, institutionName, institutionLo
       <div className={styles.sidebarHeader}>
         <div className={styles.brandWrapper}>
           <div className={styles.mainBrand}>
-            <span className={styles.appIcon}>🕌</span>
+            <img src="/logo.png" alt="Logo" className={styles.appIconImg} />
             <h2 className={styles.appTitle}>Namazdayım</h2>
+
           </div>
           
           {institutionName && (

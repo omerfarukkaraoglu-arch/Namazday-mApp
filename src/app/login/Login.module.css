@@ -31,14 +31,14 @@
   padding: 1.5rem 1.5rem 0;
 }
 
-.logoIcon {
-  font-size: 3rem;
-  background: rgba(52, 152, 219, 0.1);
-  padding: 1rem;
-  border-radius: 50%;
+.logoImg {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
   margin-bottom: 1rem;
-  color: var(--primary);
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
 }
+
 
 .title {
   font-size: 1.5rem;

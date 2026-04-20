@@ -39,7 +39,8 @@ export default function LoginPage() {
       >
         <Card glass className={styles.loginCard}>
           <div className={styles.logoContainer}>
-            <span className={styles.logoIcon}>🕌</span>
+            <img src="/logo.png" alt="Logo" className={styles.logoImg} />
+
             <h1 className={styles.title}>Namazdayım</h1>
             <p className={styles.subtitle}>Sisteme giriş yapın</p>
           </div>

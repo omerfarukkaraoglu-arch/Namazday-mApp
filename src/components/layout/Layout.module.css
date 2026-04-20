@@ -48,8 +48,10 @@
   gap: 0.75rem;
 }
 
-.appIcon {
-  font-size: 1.5rem;
+.appIconImg {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
