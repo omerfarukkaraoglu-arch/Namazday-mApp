@@ -56,7 +56,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
 
       {/* Mobile Bottom Navigation */}
       <div className={styles.mobileNavWrapper}>
-        <MobileNav isAdmin={isAdmin} userRole={user.role} />
+        <MobileNav isAdmin={isAdmin} userRole={user.role} isSystemAdmin={isSystemAdmin} />
       </div>
     </div>
   );
