@@ -36,13 +36,20 @@ export async function getPrayerTimes() {
   });
 }
 
-export async function getStudentsForAttendance(prayerTimeId?: string, classId?: string, levelId?: string) {
+export async function getStudentsForAttendance(prayerTimeId?: string, classId?: string, levelId?: string, categoryId?: string) {
   const user = await getUserContext();
   if (!user) return [];
 
   const whereClause: any = { isActive: true, institutionId: user.institutionId };
   if (classId) whereClause.classId = classId;
   if (levelId) whereClause.levelId = levelId;
+  
+  if (categoryId && !classId && !levelId) {
+    whereClause.OR = [
+      { class: { categoryId: categoryId } },
+      { level: { categoryId: categoryId } }
+    ];
+  }
 
   // Vakit bazlı muafiyet (Exemption) filtresi
   if (prayerTimeId) {

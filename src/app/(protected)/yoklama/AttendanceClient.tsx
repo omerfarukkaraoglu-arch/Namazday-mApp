@@ -54,7 +54,12 @@ export function AttendanceClient({ initialClasses, initialLevels, categories, pr
       setLoading(true);
       try {
         const [studentData, existingAttendance] = await Promise.all([
-          getStudentsForAttendance(selectedPrayer, selectedClass || undefined, selectedLevel || undefined),
+          getStudentsForAttendance(
+            selectedPrayer, 
+            selectedClass || undefined, 
+            selectedLevel || undefined,
+            selectedCategory || undefined
+          ),
           getDailyAttendance(new Date(selectedDate), selectedPrayer)
         ]);
 
@@ -85,7 +90,7 @@ export function AttendanceClient({ initialClasses, initialLevels, categories, pr
     if (selectedPrayer && selectedDate) {
       loadData();
     }
-  }, [selectedClass, selectedLevel, selectedPrayer, selectedDate]);
+  }, [selectedClass, selectedLevel, selectedCategory, selectedPrayer, selectedDate]);
 
   const handleStatusChange = (studentId: string, status: string) => {
     setAttendance(prev => ({
