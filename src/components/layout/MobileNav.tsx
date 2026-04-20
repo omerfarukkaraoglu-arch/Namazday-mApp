@@ -18,6 +18,7 @@ export function MobileNav({ isAdmin, userRole }: MobileNavProps) {
     { name: 'Özet', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Yoklama', href: '/yoklama', icon: CheckSquare },
     { name: 'Öğrenciler', href: '/ogrenciler', icon: Users },
+    { name: 'Raporlar', href: '/raporlar', icon: BarChart3 },
   ];
 
   if (checkRole(userRole, 'SYSTEM_ADMIN')) {
@@ -25,12 +26,10 @@ export function MobileNav({ isAdmin, userRole }: MobileNavProps) {
   }
 
   if (isAdmin) {
-    navItems.push({ name: 'Ayar', href: '/yonetim/ayarlar', icon: Settings });
+    navItems.push({ name: 'Ayarlar', href: '/yonetim/ayarlar', icon: Settings });
   }
 
-  if (navItems.length < 5) {
-    navItems.push({ name: 'Profil', href: '/profil', icon: User });
-  }
+  navItems.push({ name: 'Profil', href: '/profil', icon: User });
 
   const others = navItems.filter(item => item.name !== 'Yoklama');
   const yoklamaItem = navItems.find(item => item.name === 'Yoklama');

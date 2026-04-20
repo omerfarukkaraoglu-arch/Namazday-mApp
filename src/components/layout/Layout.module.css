@@ -340,9 +340,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 0.15rem; /* Reduced gap to fit more items */
   color: var(--text-secondary);
   transition: color 0.2s;
+  padding: 0.25rem 0;
 }
 
 .mobileNavLinkActive {
@@ -362,14 +363,14 @@
 .prominentLink {
   height: 100% !important;
   justify-content: flex-end !important;
-  padding-bottom: 8px !important;
+  padding-bottom: 6px !important;
 }
 
 .prominentIconBox {
   background: var(--success);
   color: white !important;
-  width: 56px;
-  height: 56px;
+  width: 52px; /* Slightly smaller for 5 items */
+  height: 52px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -378,7 +379,7 @@
   top: -24px;
   left: 50%;
   transform: translateX(-50%);
-  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
   border: 4px solid var(--surface);
   transition: all 0.2s ease;
 }
@@ -394,6 +395,7 @@
 }
 
 .mobileNavText {
-  font-size: 0.65rem;
+  font-size: 0.6rem; /* Slightly smaller for better fit */
   font-weight: 500;
+  letter-spacing: -0.01em;
 }
