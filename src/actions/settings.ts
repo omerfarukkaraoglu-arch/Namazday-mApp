@@ -1,0 +1,138 @@
+'use server';
+
+import { prisma } from '@/lib/db';
+import { checkRole, hasAdminPrivileges, isVIPAdmin } from '@/lib/auth';
+import { getUserContext } from '@/lib/auth-server';
+import { revalidatePath } from 'next/cache';
+
+export async function getSettingsData() {
+  const user = await getUserContext();
+  if (!user) return { classes: [], levels: [], prayerTimes: [] };
+
+  const [classes, levels, prayerTimes] = await Promise.all([
+    prisma.class.findMany({ 
+      where: { institutionId: user.institutionId },
+      orderBy: { sortOrder: 'asc' } 
+    }),
+    prisma.level.findMany({ 
+      where: { institutionId: user.institutionId },
+      orderBy: { sortOrder: 'asc' } 
+    }),
+    prisma.prayerTime.findMany({ 
+      where: { institutionId: user.institutionId },
+      include: { excludedClasses: true },
+      orderBy: { sortOrder: 'asc' } 
+    }),
+  ]);
+  return { classes, levels, prayerTimes };
+}
+
+export async function saveSetting(type: 'class' | 'level' | 'prayerTime', data: any) {
+  const user = await getUserContext();
+  if (!user || !hasAdminPrivileges(user)) return { error: 'Yetkisiz işlem.' };
+
+  try {
+    if (data.id) {
+      if (type === 'prayerTime') {
+        await prisma.prayerTime.update({
+          where: { id: data.id, institutionId: user.institutionId },
+          data: { 
+            name: data.name, 
+            sortOrder: parseInt(data.sortOrder), 
+            isActive: data.isActive,
+            activeDays: data.activeDays,
+            excludedClasses: {
+              set: data.excludedClassIds?.map((id: string) => ({ id })) || []
+            }
+          }
+        });
+      } else if (type === 'class') {
+        await prisma.class.update({
+          where: { id: data.id, institutionId: user.institutionId },
+          data: { name: data.name, sortOrder: parseInt(data.sortOrder), isActive: data.isActive }
+        });
+      } else {
+        await prisma.level.update({
+          where: { id: data.id, institutionId: user.institutionId },
+          data: { name: data.name, sortOrder: parseInt(data.sortOrder), isActive: data.isActive }
+        });
+      }
+    } else {
+      if (type === 'prayerTime') {
+        await prisma.prayerTime.create({
+          data: { 
+            name: data.name, 
+            sortOrder: parseInt(data.sortOrder), 
+            isActive: data.isActive,
+            activeDays: data.activeDays,
+            institutionId: user.institutionId,
+            excludedClasses: {
+              connect: data.excludedClassIds?.map((id: string) => ({ id })) || []
+            }
+          }
+        });
+      } else if (type === 'class') {
+        await prisma.class.create({
+          data: { name: data.name, sortOrder: parseInt(data.sortOrder), isActive: data.isActive, institutionId: user.institutionId }
+        });
+      } else {
+        await prisma.level.create({
+          data: { name: data.name, sortOrder: parseInt(data.sortOrder), isActive: data.isActive, institutionId: user.institutionId }
+        });
+      }
+    }
+    
+    revalidatePath(`/yonetim/siniflar`);
+    revalidatePath(`/yonetim/seviyeler`);
+    revalidatePath(`/yonetim/vakitler`);
+    return { success: true };
+  } catch (error) {
+    console.error('Save setting error:', error);
+    return { error: 'Kaydetme işlemi başarısız. Aynı isimde bir kayıt zaten olabilir.' };
+  }
+}
+
+export async function toggleSettingStatus(type: 'class' | 'level' | 'prayerTime', id: string, currentStatus: boolean) {
+  const user = await getUserContext();
+  if (!user || !hasAdminPrivileges(user)) return { error: 'Yetkisiz işlem.' };
+
+  try {
+    if (type === 'class') {
+      await prisma.class.update({ where: { id, institutionId: user.institutionId }, data: { isActive: !currentStatus } });
+    } else if (type === 'level') {
+      await prisma.level.update({ where: { id, institutionId: user.institutionId }, data: { isActive: !currentStatus } });
+    } else if (type === 'prayerTime') {
+      await prisma.prayerTime.update({ where: { id, institutionId: user.institutionId }, data: { isActive: !currentStatus } });
+    }
+
+    revalidatePath(`/yonetim/siniflar`);
+    revalidatePath(`/yonetim/seviyeler`);
+    revalidatePath(`/yonetim/vakitler`);
+    return { success: true };
+  } catch (error) {
+    return { error: 'Durum güncellenirken hata oluştu.' };
+  }
+}
+
+export async function deleteSetting(type: 'class' | 'level' | 'prayerTime', id: string) {
+  const user = await getUserContext();
+  if (!user || !hasAdminPrivileges(user)) return { error: 'Yetkisiz işlem.' };
+
+  try {
+    if (type === 'class') {
+      await prisma.class.delete({ where: { id, institutionId: user.institutionId } });
+    } else if (type === 'level') {
+      await prisma.level.delete({ where: { id, institutionId: user.institutionId } });
+    } else if (type === 'prayerTime') {
+      await prisma.prayerTime.delete({ where: { id, institutionId: user.institutionId } });
+    }
+
+    revalidatePath(`/yonetim/siniflar`);
+    revalidatePath(`/yonetim/seviyeler`);
+    revalidatePath(`/yonetim/vakitler`);
+    return { success: true };
+  } catch (error) {
+    console.error('Delete setting error:', error);
+    return { error: 'Silme işlemi başarısız. Bu kayda bağlı öğrenciler veya yoklama kayıtları olabilir.' };
+  }
+}

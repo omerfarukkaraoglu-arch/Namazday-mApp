@@ -1,0 +1,23 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-success { background-color: rgba(39, 174, 96, 0.15); color: var(--success); }
+.badge-danger { background-color: rgba(231, 76, 60, 0.15); color: var(--danger); }
+.badge-warning { background-color: rgba(243, 156, 18, 0.15); color: var(--warning); }
+.badge-info { background-color: rgba(142, 68, 173, 0.15); color: var(--info); }
+.badge-delay { background-color: rgba(214, 137, 16, 0.15); color: var(--delay); }
+.badge-neutral { background-color: var(--surface-hover); color: var(--text-secondary); }
+
+[data-theme='dark'] .badge-success { background-color: rgba(39, 174, 96, 0.25); color: #4ade80; }
+[data-theme='dark'] .badge-danger { background-color: rgba(231, 76, 60, 0.25); color: #f87171; }
+[data-theme='dark'] .badge-warning { background-color: rgba(243, 156, 18, 0.25); color: #fbbf24; }
+[data-theme='dark'] .badge-info { background-color: rgba(142, 68, 173, 0.25); color: #c084fc; }
+[data-theme='dark'] .badge-delay { background-color: rgba(214, 137, 16, 0.25); color: #fcd34d; }

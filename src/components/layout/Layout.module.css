@@ -1,0 +1,393 @@
+.appContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+/* Sidebar Styles */
+.sidebarWrapper {
+  display: none;
+  width: 260px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background-color: var(--surface);
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .sidebarWrapper {
+    display: block;
+  }
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.sidebarHeader {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.brandWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 1rem;
+}
+
+.mainBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.appIcon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.appTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0;
+  letter-spacing: -0.02e;
+}
+
+.instCard {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.instCardHeader {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+.instCardBody {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.miniIcon {
+  width: 28px;
+  height: 28px;
+  background: var(--surface);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  border: 1px solid var(--border);
+}
+
+.instName {
+  font-size: 0.875rem;
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.brandLogo {
+  width: 32px;
+  height: 32px;
+  max-width: 32px;
+  max-height: 32px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: white;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.nav {
+  flex: 1;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navItem {
+  margin: 0;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  background-color: var(--surface-hover);
+  color: var(--text);
+}
+
+.navLinkActive {
+  background-color: rgba(30, 58, 95, 0.1);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .navLinkActive {
+  background-color: rgba(93, 173, 226, 0.15);
+  color: var(--blue-light);
+}
+
+.navIcon {
+  flex-shrink: 0;
+}
+
+.sidebarFooter {
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--danger);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.logoutBtn:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+/* Main Content Area */
+.mainWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Header Styles */
+.header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+}
+
+.mobileTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .mobileTitle {
+    display: none;
+  }
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profileBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-full);
+  transition: background-color 0.2s;
+}
+
+.profileBtn:hover {
+  background-color: var(--surface-hover);
+}
+
+.avatar {
+  background-color: var(--primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.displayName {
+  font-weight: 500;
+  font-size: 0.875rem;
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .displayName {
+    display: block;
+  }
+}
+
+/* Main Content */
+.mainContent {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  padding-bottom: calc(1.5rem + 70px); /* Mobile nav allowance */
+}
+
+@media (min-width: 768px) {
+  .mainContent {
+    padding: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+.contentInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Mobile Bottom Navigation */
+.mobileNavWrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 30;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (min-width: 768px) {
+  .mobileNavWrapper {
+    display: none;
+  }
+}
+
+.mobileNav {
+  display: flex;
+  height: 64px;
+}
+
+.mobileNavList {
+  display: flex;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mobileNavItem {
+  flex: 1;
+  display: flex;
+}
+
+.mobileNavLink {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+.mobileNavLinkActive {
+  color: var(--primary);
+}
+
+[data-theme='dark'] .mobileNavLinkActive {
+  color: var(--blue-light);
+}
+
+/* Prominent Yoklama Button (FAB Style) */
+.prominentWrapper {
+  position: relative;
+  z-index: 5;
+}
+
+.prominentLink {
+  height: 100% !important;
+  justify-content: flex-end !important;
+  padding-bottom: 8px !important;
+}
+
+.prominentIconBox {
+  background: var(--success);
+  color: white !important;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+  border: 4px solid var(--surface);
+  transition: all 0.2s ease;
+}
+
+.prominentLink:hover .prominentIconBox {
+  background: #2ecc71;
+  transform: translateX(-50%) scale(1.05);
+}
+
+.prominentLink .mobileNavText {
+  color: var(--success) !important;
+  font-weight: 700 !important;
+}
+
+.mobileNavText {
+  font-size: 0.65rem;
+  font-weight: 500;
+}

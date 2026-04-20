@@ -1,0 +1,263 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: #666;
+}
+
+.addCard {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.addForm {
+  display: flex;
+  gap: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.instCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+.inactiveCard {
+  opacity: 0.7;
+  filter: grayscale(0.5);
+}
+
+.instHeader {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.logoSection {
+  flex-shrink: 0;
+}
+
+.instLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.iconBox {
+  width: 48px;
+  height: 48px;
+  background: rgba(41, 128, 185, 0.1);
+  color: #2980b9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.instMainInfo {
+  flex: 1;
+}
+
+.instMainInfo h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.badgeActive, .badgeInactive {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.badgeActive { background: #e6f7ef; color: #10b981; }
+.badgeInactive { background: #fef2f2; color: #ef4444; }
+
+.stats {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.deactivateBtn { color: #ef4444; }
+.deactivateBtn:hover { background: #fef2f2; }
+
+.activateBtn { color: #10b981; }
+.activateBtn:hover { background: #e6f7ef; }
+
+/* Modal Styles */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modalCard {
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  animation: modalScale 0.2s ease-out;
+}
+
+@keyframes modalScale {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modalHeader h3 { margin: 0; }
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.closeBtn:hover { background: #f0f0f0; color: #333; }
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.logoUploadArea {
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fcfcfc;
+  transition: all 0.2s;
+}
+
+.uploadPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 0;
+  color: #666;
+  cursor: pointer;
+}
+
+.uploadPlaceholder:hover {
+  background: #f5f5f5;
+  border-color: #2980b9;
+}
+
+.uploadPlaceholder span {
+  font-weight: 500;
+  color: #2980b9;
+}
+
+.uploadPlaceholder p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.logoPreviewWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logoPreview {
+  max-width: 150px;
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: white;
+  border: 1px solid #eee;
+}
+
+.removeLogoBtn {
+  color: #ef4444;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}

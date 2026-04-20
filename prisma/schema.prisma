@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// Institution: The top-level entity
+model Institution {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  logo      String?  // Base64 string for branding
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  users       User[]
+  students    Student[]
+  classes     Class[]
+  levels      Level[]
+  prayerTimes PrayerTime[]
+  attendances Attendance[]
+}
+
+model User {
+  id           String       @id @default(uuid())
+  username     String       @unique
+  passwordHash String
+  displayName  String
+  role         String       @default("YOKLAMACI") // SYSTEM_ADMIN, SUPER_ADMIN, YOKLAMACI
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  
+  attendances  Attendance[]
+}
+
+model Class {
+  id        String    @id @default(uuid())
+  name      String
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  
+  students  Student[]
+  exemptPrayers PrayerTime[] @relation("ExcludedClasses")
+
+  @@unique([name, institutionId])
+}
+
+model Level {
+  id        String    @id @default(uuid())
+  name      String
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  
+  students  Student[]
+
+  @@unique([name, institutionId])
+}
+
+model Student {
+  id          String       @id @default(uuid())
+  fullName    String
+  studentNo   String
+  classId     String
+  levelId     String
+  parentName  String?
+  parentPhone String?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+
+  class       Class        @relation(fields: [classId], references: [id])
+  level       Level        @relation(fields: [levelId], references: [id])
+  attendances Attendance[]
+
+  @@unique([studentNo, institutionId])
+}
+
+model PrayerTime {
+  id        String       @id @default(uuid())
+  name      String
+  sortOrder Int
+  isDefault Boolean      @default(false)
+  isActive  Boolean      @default(true)
+  activeDays String      @default("1,2,3,4,5,6,0")
+  createdAt DateTime     @default(now())
+  
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  
+  attendances Attendance[]
+  excludedClasses Class[] @relation("ExcludedClasses")
+
+  @@unique([name, institutionId])
+}
+
+model Attendance {
+  id           String           @id @default(uuid())
+  studentId    String
+  prayerTimeId String
+  date         DateTime
+  status       String
+  takenById    String
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+
+  student      Student          @relation(fields: [studentId], references: [id])
+  prayerTime   PrayerTime       @relation(fields: [prayerTimeId], references: [id])
+  takenBy      User             @relation(fields: [takenById], references: [id])
+
+  @@unique([studentId, prayerTimeId, date])
+}
