@@ -49,9 +49,13 @@
 }
 
 .appIconImg {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
+  background-color: #0F172A; /* Logo arka planı */
+  border-radius: 50%;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
