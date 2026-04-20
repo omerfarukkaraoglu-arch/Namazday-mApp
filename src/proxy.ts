@@ -11,10 +11,12 @@ export default async function proxy(request: NextRequest) {
     pathname.startsWith('/api/public') ||
     pathname.startsWith('/icons') ||
     pathname === '/favicon.ico' || 
+    pathname === '/logo.png' ||
     pathname === '/manifest.json'
   ) {
     return NextResponse.next();
   }
+
 
   const token = request.cookies.get('auth_token')?.value;
   const isLoginPage = pathname === '/login';
