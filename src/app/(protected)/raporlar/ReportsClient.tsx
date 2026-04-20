@@ -50,8 +50,7 @@ export function ReportsClient({
   };
 
   const filteredStudents = options.students.filter((s: any) => 
-    s.fullName.toLowerCase().includes(studentSearch.toLowerCase()) || 
-    s.studentNo.includes(studentSearch)
+    s.fullName.toLowerCase().includes(studentSearch.toLowerCase())
   );
 
   const applyFilters = async () => {
@@ -119,7 +118,7 @@ export function ReportsClient({
             <div className={styles.searchableSelect}>
               <label className={styles.label}>Öğrenci Bul</label>
               <Input 
-                placeholder="İsim veya No ile ara..." 
+                placeholder="Öğrenci Ara..." 
                 value={studentSearch} 
                 onChange={e => setStudentSearch(e.target.value)}
                 style={{ marginBottom: '0.25rem' }}
@@ -337,7 +336,7 @@ export function ReportsClient({
                       <TableRow key={record.id}>
                         <TableCell>{new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short' }).format(new Date(record.date))}</TableCell>
                         <TableCell>
-                          <strong>{record.student.studentNo}</strong> - {record.student.fullName}
+                          {record.student.fullName}
                         </TableCell>
                         <TableCell>{record.student.class?.name || '-'}</TableCell>
                         <TableCell>{record.prayerTime.name}</TableCell>

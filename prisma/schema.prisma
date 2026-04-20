@@ -97,7 +97,7 @@ model Category {
 model Student {
   id          String       @id @default(uuid())
   fullName    String
-  studentNo   String
+  studentNo   String?
   classId     String
   levelId     String
   parentName  String?
@@ -112,8 +112,6 @@ model Student {
   class       Class        @relation(fields: [classId], references: [id])
   level       Level        @relation(fields: [levelId], references: [id])
   attendances Attendance[]
-
-  @@unique([studentNo, institutionId])
 }
 
 model PrayerTime {

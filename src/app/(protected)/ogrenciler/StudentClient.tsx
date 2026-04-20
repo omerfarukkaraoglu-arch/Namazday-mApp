@@ -18,7 +18,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterClass, setFilterClass] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<'name' | 'no' | 'class'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'class'>('name');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -28,13 +28,11 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
   const [loading, setLoading] = useState(false);
 
   const filteredStudents = students.filter((s: any) => {
-    const matchSearch = s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                        s.studentNo.includes(searchTerm);
+    const matchSearch = s.fullName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchClass = filterClass ? s.classId === filterClass : true;
     return matchSearch && matchClass;
   }).sort((a: any, b: any) => {
     if (sortBy === 'name') return a.fullName.localeCompare(b.fullName, 'tr');
-    if (sortBy === 'no') return a.studentNo.localeCompare(b.studentNo);
     if (sortBy === 'class') {
       if (a.class?.sortOrder !== b.class?.sortOrder) return (a.class?.sortOrder || 0) - (b.class?.sortOrder || 0);
       return a.fullName.localeCompare(b.fullName, 'tr');
@@ -90,7 +88,6 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
       setEditStudent(student);
       setFormData({
         fullName: student.fullName,
-        studentNo: student.studentNo,
         classId: student.classId,
         levelId: student.levelId,
         parentName: student.parentName || '',
@@ -99,14 +96,14 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
     } else {
       setEditStudent(null);
       setFormData({
-        fullName: '', studentNo: '', classId: classes[0]?.id || '', levelId: levels[0]?.id || '', parentName: '', parentPhone: ''
+        fullName: '', classId: classes[0]?.id || '', levelId: levels[0]?.id || '', parentName: '', parentPhone: ''
       });
     }
     setIsModalOpen(true);
   };
 // ... (omitting form states and submit handlers for brevity, keeping only the return logic)
   const [formData, setFormData] = useState({
-    fullName: '', studentNo: '', classId: '', levelId: '', parentName: '', parentPhone: ''
+    fullName: '', classId: '', levelId: '', parentName: '', parentPhone: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -177,8 +174,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
           <div className={styles.filtersGrid}>
             <div className={styles.filterGroup}>
               <Input 
-                placeholder="Öğrenci Adı veya No..." 
-                value={searchTerm}
+                placeholder="Öğrenci Ara..." 
                 onChange={e => { setSearchTerm(e.target.value); setSelectedIds([]); }}
                 icon={<Search size={18} />}
               />
@@ -194,7 +190,6 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
             <div className={styles.filterGroup}>
               <Select value={sortBy} onChange={e => setSortBy(e.target.value as any)}>
                 <option value="name">İsim (A-Z)</option>
-                <option value="no">Öğrenci No</option>
                 <option value="class">Sınıf (Sıra No)</option>
               </Select>
             </div>
@@ -227,7 +222,6 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
                       </div>
                     </TableHeader>
                   )}
-                  <TableHeader>Öğrenci No</TableHeader>
                   <TableHeader>Ad Soyad</TableHeader>
                   <TableHeader>Sınıf</TableHeader>
                   <TableHeader>Durum</TableHeader>
@@ -257,7 +251,6 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
                             </div>
                           </TableCell>
                         )}
-                        <TableCell><strong>{s.studentNo}</strong></TableCell>
                         <TableCell>
                           <Link href={`/ogrenciler/${s.id}`} style={{ color: 'var(--primary)', fontWeight: '500' }}>
                             {s.fullName}
@@ -316,9 +309,6 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
           <form onSubmit={handleSubmit} className={styles.formGrid}>
             <div className={styles.formFull}>
               <Input label="Ad Soyad" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
-            </div>
-            <div>
-              <Input label="Öğrenci No (Benzersiz)" required value={formData.studentNo} onChange={e => setFormData({...formData, studentNo: e.target.value})} />
             </div>
             <div>
               <Select label="Sınıf" required value={formData.classId} onChange={e => setFormData({...formData, classId: e.target.value})}>
@@ -388,7 +378,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
                 className={styles.csvTextArea}
                 value={csvText}
                 onChange={(e) => { setCsvText(e.target.value); setExcelFile(null); }}
-                placeholder="Örnek: Ahmet Yılmaz, 1054, 9-A, Lise Seviyesi"
+                placeholder="Örnek: Ahmet Yılmaz, , 9-A, Lise Seviyesi"
               />
               <p className={styles.helpText}>Kopyala-yapıştır ile hızlı ekleme yapabilirsiniz (Virgülle ayrılmış format).</p>
 

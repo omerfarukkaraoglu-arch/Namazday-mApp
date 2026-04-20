@@ -285,7 +285,7 @@ export function AttendanceClient({ initialClasses, initialLevels, categories, pr
                     </div>
                     <div className={styles.studentDetails}>
                       <h3>{student.fullName}</h3>
-                      <p>{student.studentNo} • {student.class?.name} • {student.level?.name}</p>
+                      <p>{student.class?.name} • {student.level?.name}</p>
                     </div>
                   </div>
                   

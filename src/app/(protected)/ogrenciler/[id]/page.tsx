@@ -72,10 +72,6 @@ export default async function StudentDetailPage({
                 
                 <div className={styles.infoList}>
                   <div className={styles.infoItem}>
-                    <span className={styles.infoLabel}>Okul No</span>
-                    <span className={styles.infoValue}>{student.studentNo}</span>
-                  </div>
-                  <div className={styles.infoItem}>
                     <span className={styles.infoLabel}>Sınıf</span>
                     <span className={styles.infoValue}>{student.class?.name || '-'}</span>
                   </div>

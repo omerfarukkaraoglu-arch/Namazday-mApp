@@ -8,7 +8,6 @@ import autoTable from 'jspdf-autotable';
 export const exportToExcel = (data: any[], fileName: string) => {
   const worksheetData = data.map(record => ({
     'Tarih': new Intl.DateTimeFormat('tr-TR').format(new Date(record.date)),
-    'Öğrenci No': record.student.studentNo,
     'Ad Soyad': record.student.fullName,
     'Sınıf': record.student.class?.name || '-',
     'Vakit': record.prayerTime.name,
@@ -101,14 +100,13 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
 
   const tableRows = data.map(record => [
     new Intl.DateTimeFormat('tr-TR').format(new Date(record.date)),
-    record.student.studentNo,
     trFix(record.student.fullName),
     trFix(record.student.class?.name || '-'),
     trFix(record.prayerTime.name),
     trFix(record.status)
   ]);
 
-  const tableColumn = ["Tarih", "No", "Ad Soyad", "Sinif", "Vakit", "Durum"];
+  const tableColumn = ["Tarih", "Ad Soyad", "Sinif", "Vakit", "Durum"];
 
   autoTable(doc, {
     startY: currentY,
