@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db';
 import { getUserContext } from '@/lib/auth-server';
 import { revalidatePath } from 'next/cache';
+import * as XLSX from 'xlsx';
 
 export async function getStudents() {
   const user = await getUserContext();
@@ -224,5 +225,86 @@ export async function bulkToggleStudentStatus(ids: string[], targetStatus: boole
   } catch (error) {
     console.error('Bulk toggle error:', error);
     return { error: 'Durum güncelleme sırasında hata oluştu.' };
+  }
+}
+
+export async function bulkImportStudentsFromExcel(base64Data: string) {
+  const user = await getUserContext();
+  if (!user || (!['SUPER_ADMIN', 'SYSTEM_ADMIN', 'admin'].includes(user.role.toUpperCase()))) {
+    return { error: 'Yetkisiz işlem.' };
+  }
+
+  try {
+    const buffer = Buffer.from(base64Data, 'base64');
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const data: any[] = XLSX.utils.sheet_to_json(worksheet);
+
+    if (data.length === 0) return { error: 'Excel dosyası boş veya okunamadı.' };
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const row of data) {
+      try {
+        const fullName = row['Ad Soyad'] || row['ad soyad'] || row['Full Name'];
+        const studentNo = String(row['Öğrenci No'] || row['öğrenci no'] || row['Student No'] || '').trim();
+        const className = row['Sınıf'] || row['sınıf'] || row['Class'];
+        const levelName = row['Seviye'] || row['seviye'] || row['Level'];
+        const parentName = row['Veli Adı'] || row['veli adı'] || row['Parent Name'];
+        const parentPhone = row['Veli Telefon'] || row['veli telefon'] || row['Parent Phone'];
+
+        if (!fullName || !studentNo || !className || !levelName) {
+          errorCount++;
+          continue;
+        }
+
+        const classRecord = await prisma.class.upsert({
+          where: { name_institutionId: { name: String(className), institutionId: user.institutionId } },
+          update: {},
+          create: { name: String(className), sortOrder: 99, institutionId: user.institutionId }
+        });
+
+        const levelRecord = await prisma.level.upsert({
+          where: { name_institutionId: { name: String(levelName), institutionId: user.institutionId } },
+          update: {},
+          create: { name: String(levelName), sortOrder: 99, institutionId: user.institutionId }
+        });
+
+        await prisma.student.upsert({
+          where: { studentNo_institutionId: { studentNo: String(studentNo), institutionId: user.institutionId } },
+          update: {
+            fullName: String(fullName),
+            classId: classRecord.id,
+            levelId: levelRecord.id,
+            parentName: parentName ? String(parentName) : null,
+            parentPhone: parentPhone ? String(parentPhone) : null,
+            isActive: true
+          },
+          create: {
+            fullName: String(fullName),
+            studentNo: String(studentNo),
+            classId: classRecord.id,
+            levelId: levelRecord.id,
+            parentName: parentName ? String(parentName) : null,
+            parentPhone: parentPhone ? String(parentPhone) : null,
+            isActive: true,
+            institutionId: user.institutionId
+          }
+        });
+
+        successCount++;
+      } catch (err) {
+        console.error('Row import error:', err, row);
+        errorCount++;
+      }
+    }
+
+    revalidatePath('/ogrenciler');
+    return { success: true, successCount, errorCount };
+  } catch (error) {
+    console.error('Excel import error:', error);
+    return { error: 'Excel dosyası işlenirken bir hata oluştu.' };
   }
 }

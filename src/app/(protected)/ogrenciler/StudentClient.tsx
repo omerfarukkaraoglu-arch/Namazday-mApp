@@ -8,10 +8,11 @@ import { Select } from '@/components/ui/Select';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
-import { createOrUpdateStudent, toggleStudentStatus, bulkImportStudents, deleteStudents, bulkToggleStudentStatus } from '@/actions/students';
+import { createOrUpdateStudent, toggleStudentStatus, bulkImportStudents, deleteStudents, bulkToggleStudentStatus, bulkImportStudentsFromExcel } from '@/actions/students';
 import styles from './Ogrenciler.module.css';
-import { Search, Plus, Edit, Power, PowerOff, Upload, Trash2, CheckSquare, Square, X } from 'lucide-react';
+import { Search, Plus, Edit, Power, PowerOff, Upload, Trash2, CheckSquare, Square, X, Download, FileSpreadsheet } from 'lucide-react';
 import Link from 'next/link';
+import { downloadStudentTemplate, fileToBase64 } from '@/lib/excelUtils';
 
 export function StudentClient({ students, classes, levels, isAdmin }: any) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,6 +22,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [csvText, setCsvText] = useState('');
+  const [excelFile, setExcelFile] = useState<File | null>(null);
   const [editStudent, setEditStudent] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -115,16 +117,32 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
 
   const handleBulkSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!csvText.trim()) return;
-    setLoading(true);
-    const result = await bulkImportStudents(csvText);
-    if (result.error) alert(result.error);
-    else {
-      alert(`Toplu ekleme başarılı! İşlenen: ${result.successCount}, Hatalı Satır: ${result.errorCount}`);
-      setCsvText('');
-      setIsBulkModalOpen(false);
+    if (excelFile) {
+      setLoading(true);
+      try {
+        const base64 = await fileToBase64(excelFile);
+        const result = await bulkImportStudentsFromExcel(base64);
+        if (result.error) alert(result.error);
+        else {
+          alert(`Excel aktarımı başarılı! İşlenen: ${result.successCount}, Hatalı Satır: ${result.errorCount}`);
+          setExcelFile(null);
+          setIsBulkModalOpen(false);
+        }
+      } catch (err) {
+        alert('Dosya okunurken bir hata oluştu.');
+      }
+      setLoading(false);
+    } else if (csvText.trim()) {
+      setLoading(true);
+      const result = await bulkImportStudents(csvText);
+      if (result.error) alert(result.error);
+      else {
+        alert(`Toplu ekleme başarılı! İşlenen: ${result.successCount}, Hatalı Satır: ${result.errorCount}`);
+        setCsvText('');
+        setIsBulkModalOpen(false);
+      }
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -318,34 +336,54 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
           onClose={() => setIsBulkModalOpen(false)} 
           title="Toplu Öğrenci İçe Aktar"
         >
-          <form onSubmit={handleBulkSubmit}>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-              Öğrencileri Excel veya metin belgesinden kopyalayıp buraya yapıştırabilirsiniz. <br />
-              <b>Beklenen Format (Virgülle Ayrılmış):</b> Ad Soyad, Numara, Sınıfı, Seviye <br />
-              <i>Örnek:</i> Ahmet Yılmaz, 1054, 9-A, Lise Seviyesi
-            </p>
-            <textarea
-              style={{
-                width: '100%',
-                height: '200px',
-                padding: '0.75rem',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-                backgroundColor: 'var(--bg)',
-                color: 'var(--text)',
-                fontFamily: 'monospace',
-                fontSize: '0.875rem'
-              }}
-              value={csvText}
-              onChange={(e) => setCsvText(e.target.value)}
-              placeholder="Ahmet Yılmaz, 1054, 9-A, Lise Seviyesi&#10;Mehmet Demir, 1055, 10-B, Lise Seviyesi"
-              required
-            />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
-              <Button type="button" variant="secondary" onClick={() => setIsBulkModalOpen(false)}>İptal</Button>
-              <Button type="submit" disabled={loading}>{loading ? 'Yükleniyor...' : 'Aktar'}</Button>
+          <div className={styles.importOptions}>
+            <div className={styles.templateSection}>
+              <div className={styles.templateInfo}>
+                <FileSpreadsheet size={24} color="var(--primary)" />
+                <div>
+                  <strong>Excel Taslağı Kullanın</strong>
+                  <p>Hata almamak için önceden hazırlanmış şablonu kullanmanızı öneririz.</p>
+                </div>
+              </div>
+              <Button variant="secondary" size="sm" onClick={downloadStudentTemplate}>
+                <Download size={16} /> Taslağı İndir (.xlsx)
+              </Button>
             </div>
-          </form>
+
+            <hr className={styles.divider} />
+
+            <form onSubmit={handleBulkSubmit} className={styles.importForm}>
+              <div className={styles.uploadArea}>
+                <label className={styles.fileLabel}>
+                  <Upload size={20} />
+                  <span>{excelFile ? excelFile.name : 'Excel Dosyası Seçin veya Sürükleyin'}</span>
+                  <input 
+                    type="file" 
+                    accept=".xlsx, .xls" 
+                    onChange={(e) => setExcelFile(e.target.files?.[0] || null)}
+                    className={styles.fileInput}
+                  />
+                </label>
+              </div>
+
+              <div className={styles.orText}>VEYA</div>
+
+              <textarea
+                className={styles.csvTextArea}
+                value={csvText}
+                onChange={(e) => { setCsvText(e.target.value); setExcelFile(null); }}
+                placeholder="Örnek: Ahmet Yılmaz, 1054, 9-A, Lise Seviyesi"
+              />
+              <p className={styles.helpText}>Kopyala-yapıştır ile hızlı ekleme yapabilirsiniz (Virgülle ayrılmış format).</p>
+
+              <div className={styles.modalActions}>
+                <Button type="button" variant="secondary" onClick={() => setIsBulkModalOpen(false)}>İptal</Button>
+                <Button type="submit" disabled={loading || (!excelFile && !csvText.trim())}>
+                  {loading ? 'İşleniyor...' : 'Öğrencileri Aktar'}
+                </Button>
+              </div>
+            </form>
+          </div>
         </Modal>
       )}
     </>
