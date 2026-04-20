@@ -16,7 +16,8 @@ export function GenericSettingsClient({
   title, 
   description, 
   type, 
-  data 
+  data,
+  categories
 }: { 
   title: string; 
   description: string; 
@@ -119,7 +120,7 @@ export function GenericSettingsClient({
                   <TableCell>{item.name}</TableCell>
                   {(type === 'class' || type === 'level') && (
                     <TableCell>
-                      <Badge variant="secondary">{item.category?.name || '-'}</Badge>
+                      <Badge variant="neutral">{item.category?.name || '-'}</Badge>
                     </TableCell>
                   )}
                   <TableCell>
@@ -190,7 +191,7 @@ export function GenericSettingsClient({
               onChange={e => setFormData({...formData, categoryId: e.target.value})}
             >
               <option value="">Seçilmedi</option>
-              {categories.map(cat => (
+              {categories.map((cat: any) => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </Select>

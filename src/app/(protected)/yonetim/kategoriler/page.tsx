@@ -19,7 +19,7 @@ export default async function CategoriesPage() {
       title="Kategoriler / Statüler"
       description="Sınıfları ve Seviyeleri gruplandırmak için kategoriler oluşturun (Örn: Ortaokul, Lise)."
       type="category"
-      data={data.categories}
+      data={data.categories || []}
     />
   );
 }
