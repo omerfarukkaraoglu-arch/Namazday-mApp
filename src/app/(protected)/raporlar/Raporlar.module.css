@@ -88,3 +88,126 @@
 .historyGridWrapper table {
   min-width: 600px;
 }
+
+/* Individual Summary Card Styles */
+.summaryCard {
+  border: 1px solid rgba(231, 76, 60, 0.2);
+  background: var(--surface);
+  border-left: 4px solid #e74c3c;
+}
+
+.summaryGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.summaryHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.summaryIcon {
+  width: 48px;
+  height: 48px;
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summaryTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.summarySubtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.summaryStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.statVal {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #e74c3c;
+  line-height: 1;
+}
+
+.statLab {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.statByPrayer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.prayerStat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.missedDatesSection {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.sectionTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.missedDatesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.missedDateTag {
+  background: rgba(231, 76, 60, 0.05);
+  color: #c0392b;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(231, 76, 60, 0.1);
+}
+
+.noMissed {
+  font-size: 0.875rem;
+  color: var(--success);
+  margin: 0;
+}

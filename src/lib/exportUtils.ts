@@ -21,9 +21,14 @@ export const exportToExcel = (data: any[], fileName: string) => {
   XLSX.writeFile(workbook, `${fileName}.xlsx`);
 };
 
-interface PDFOptions {
+export interface PDFOptions {
   institutionName?: string;
   institutionLogo?: string | null;
+  summary?: {
+    totalAbsent: number;
+    byPrayer: { name: string, count: number }[];
+    missedDates: { date: string, prayer: string }[];
+  } | null;
 }
 
 // PDF Export with Turkish Font Support (Latinization Fallback for Clean Output)
@@ -66,6 +71,33 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
   doc.setTextColor(100, 100, 100);
   doc.text(trFix(title), 14, currentY);
   doc.text(trFix(`Rapor Tarihi: ${new Intl.DateTimeFormat('tr-TR').format(new Date())}`), 14, currentY + 8);
+  currentY += 15;
+
+  // Render Summary Card if exists
+  if (options?.summary) {
+    doc.setDrawColor(231, 76, 60);
+    doc.setLineWidth(0.5);
+    doc.rect(14, currentY, 182, 35);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(44, 62, 80);
+    doc.setFont('helvetica', 'bold');
+    doc.text(trFix('DEVAMSIZLIK OZETI'), 20, currentY + 8);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(231, 76, 60);
+    doc.text(trFix(`Toplam: ${options.summary.totalAbsent} Vakit`), 20, currentY + 16);
+    
+    doc.setTextColor(44, 62, 80);
+    const prayerSummary = options.summary.byPrayer.map(p => `${p.name}: ${p.count}`).join(' | ');
+    doc.text(trFix(prayerSummary), 20, currentY + 24);
+
+    const recentMissed = options.summary.missedDates.slice(0, 5).map(m => `${m.date} ${m.prayer}`).join(', ');
+    doc.setFontSize(8);
+    doc.text(trFix(`Ornek Tarihler: ${recentMissed}`), 20, currentY + 31);
+    
+    currentY += 45;
+  }
 
   const tableRows = data.map(record => [
     new Intl.DateTimeFormat('tr-TR').format(new Date(record.date)),
@@ -79,7 +111,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
   const tableColumn = ["Tarih", "No", "Ad Soyad", "Sinif", "Vakit", "Durum"];
 
   autoTable(doc, {
-    startY: currentY + 15,
+    startY: currentY,
     head: [tableColumn],
     body: tableRows,
     theme: 'grid',

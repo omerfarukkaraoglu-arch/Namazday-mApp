@@ -9,7 +9,7 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@
 import { Badge } from '@/components/ui/Badge';
 import { PieChart, Pie, Cell, Tooltip as PieTooltip, Legend as PieLegend, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as LineTooltip, Legend as LineLegend } from 'recharts';
 import { getReportStats } from '@/actions/reports';
-import { Filter, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { Filter, Download, FileSpreadsheet, FileText, AlertCircle, Calendar, Clock } from 'lucide-react';
 import { exportToExcel, exportToPDF } from '@/lib/exportUtils';
 import styles from './Raporlar.module.css';
 
@@ -18,7 +18,8 @@ const COLORS = {
   YOK: '#e74c3c',
   GEC: '#f39c12',
   IZINLI: '#f1c40f',
-  GOREVLI: '#3498db'
+  GOREVLI: '#3498db',
+  neutral: '#95a5a6'
 };
 
 export function ReportsClient({ 
@@ -90,7 +91,8 @@ export function ReportsClient({
   const handlePDFExport = () => {
     exportToPDF(stats.records, `Namazdayim_Rapor_${new Date().getTime()}`, getExportTitle(), {
       institutionName: branding.name,
-      institutionLogo: branding.logo
+      institutionLogo: branding.logo,
+      summary: stats.absenteeismSummary
     });
   };
 
@@ -161,6 +163,57 @@ export function ReportsClient({
           </div>
         </CardContent>
       </Card>
+
+      {/* Bireysel Karne Özeti */}
+      {stats.absenteeismSummary && (
+        <Card className={styles.summaryCard}>
+          <CardContent>
+            <div className={styles.summaryGrid}>
+              <div className={styles.summaryHeader}>
+                <div className={styles.summaryIcon}>
+                  <AlertCircle size={24} />
+                </div>
+                <div>
+                  <h2 className={styles.summaryTitle}>Bireysel Devamsızlık Karnesi</h2>
+                  <p className={styles.summarySubtitle}>Seçili tarih aralığı için özet analiz.</p>
+                </div>
+              </div>
+              
+              <div className={styles.summaryStats}>
+                <div className={styles.statBox}>
+                  <span className={styles.statVal}>{stats.absenteeismSummary.totalAbsent}</span>
+                  <span className={styles.statLab}>Toplam Devamsızlık</span>
+                </div>
+                <div className={styles.statByPrayer}>
+                  {stats.absenteeismSummary.byPrayer.map((p: any) => (
+                    <div key={p.name} className={styles.prayerStat}>
+                      <Clock size={14} />
+                      <strong>{p.name}:</strong> <span>{p.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.missedDatesSection}>
+                <h3 className={styles.sectionTitle}>
+                  <Calendar size={16} /> Gelmediği Vakitler
+                </h3>
+                <div className={styles.missedDatesList}>
+                  {stats.absenteeismSummary.missedDates.length > 0 ? (
+                    stats.absenteeismSummary.missedDates.map((m: any, idx: number) => (
+                      <span key={idx} className={styles.missedDateTag}>
+                        {m.date} - {m.prayer}
+                      </span>
+                    ))
+                  ) : (
+                    <p className={styles.noMissed}>Bu aralıkta devamsızlık kaydı bulunamadı.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {stats.studentHistory && (
         <Card className={styles.historyCard}>

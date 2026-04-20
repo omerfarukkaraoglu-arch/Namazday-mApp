@@ -146,12 +146,36 @@ export async function getReportStats(filters: {
     });
   }
 
+  // Öğrenci bazlı özet devamsızlık (Karnesi)
+  let absenteeismSummary: any = null;
+  if (filters.studentId && attendances.length > 0) {
+    const totalAbsent = attendances.filter(a => a.status === 'YOK').length;
+    
+    const byPrayer: Record<string, number> = {};
+    const missedDates: { date: string, prayer: string }[] = [];
+
+    attendances.filter(a => a.status === 'YOK').forEach(a => {
+      byPrayer[a.prayerTime.name] = (byPrayer[a.prayerTime.name] || 0) + 1;
+      missedDates.push({
+        date: new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' }).format(new Date(a.date)),
+        prayer: a.prayerTime.name
+      });
+    });
+
+    absenteeismSummary = {
+      totalAbsent,
+      byPrayer: Object.entries(byPrayer).map(([name, count]) => ({ name, count })),
+      missedDates: missedDates.slice(0, 15) // Son 15 devamsızlık
+    };
+  }
+
   return {
     pieData,
     trendData,
     totalRecords: attendances.length,
     records: attendances,
     studentHistory,
+    absenteeismSummary,
     prayerTimes
   };
 }
