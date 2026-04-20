@@ -8,17 +8,22 @@ export async function getClassesAndLevels() {
   const user = await getUserContext();
   if (!user) return { classes: [], levels: [] };
 
-  const classes = await prisma.class.findMany({
-    where: { isActive: true, institutionId: user.institutionId },
-    orderBy: { sortOrder: 'asc' }
-  });
+  const [classes, levels, categories] = await Promise.all([
+    prisma.class.findMany({
+      where: { isActive: true, institutionId: user.institutionId },
+      orderBy: { sortOrder: 'asc' }
+    }),
+    prisma.level.findMany({
+      where: { isActive: true, institutionId: user.institutionId },
+      orderBy: { sortOrder: 'asc' }
+    }),
+    prisma.category.findMany({
+      where: { institutionId: user.institutionId },
+      orderBy: { sortOrder: 'asc' }
+    })
+  ]);
   
-  const levels = await prisma.level.findMany({
-    where: { isActive: true, institutionId: user.institutionId },
-    orderBy: { sortOrder: 'asc' }
-  });
-
-  return { classes, levels };
+  return { classes, levels, categories };
 }
 
 export async function getPrayerTimes() {

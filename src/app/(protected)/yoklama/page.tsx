@@ -25,6 +25,7 @@ export default async function YoklamaPage() {
       <AttendanceClient 
         initialClasses={classData.classes}
         initialLevels={classData.levels}
+        categories={classData.categories || []}
         prayerTimes={prayerTimes}
       />
     </div>

@@ -7,21 +7,26 @@ import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { saveAttendance, getStudentsForAttendance, getDailyAttendance } from '@/actions/attendance';
 import styles from './Yoklama.module.css';
-import { Check, X, Clock, FileText, UserPlus, Save } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Check, X, Clock, FileText, UserPlus, Save, Search, ArrowUpDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem } from '@/components/ui/PageWrapper';
 
 interface AttendanceClientProps {
   initialClasses: any[];
   initialLevels: any[];
+  categories: any[];
   prayerTimes: any[];
 }
 
-export function AttendanceClient({ initialClasses, initialLevels, prayerTimes }: AttendanceClientProps) {
+export function AttendanceClient({ initialClasses, initialLevels, categories, prayerTimes }: AttendanceClientProps) {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedPrayer, setSelectedPrayer] = useState(prayerTimes[0]?.id || '');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'class' | 'level'>('name');
   
   const [students, setStudents] = useState<any[]>([]);
   const [attendance, setAttendance] = useState<Record<string, string>>({});
@@ -150,22 +155,64 @@ export function AttendanceClient({ initialClasses, initialLevels, prayerTimes }:
             </div>
 
             <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>Sınıf Filtresi (Opsiyonel)</span>
-              <Select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}>
+              <span className={styles.filterLabel}>Kategori / Statü</span>
+              <Select value={selectedCategory} onChange={e => {
+                setSelectedCategory(e.target.value);
+                setSelectedClass('');
+                setSelectedLevel('');
+              }}>
                 <option value="">Tümü</option>
-                {initialClasses.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </Select>
             </div>
 
             <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>Seviye Filtresi (Opsiyonel)</span>
+              <span className={styles.filterLabel}>Sınıf Filtresi</span>
+              <Select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}>
+                <option value="">Tümü</option>
+                {initialClasses
+                  .filter(c => !selectedCategory || c.categoryId === selectedCategory)
+                  .map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))
+                }
+              </Select>
+            </div>
+
+            <div className={styles.filterGroup}>
+              <span className={styles.filterLabel}>Seviye Filtresi</span>
               <Select value={selectedLevel} onChange={e => setSelectedLevel(e.target.value)}>
                 <option value="">Tümü</option>
-                {initialLevels.map(l => (
-                  <option key={l.id} value={l.id}>{l.name}</option>
-                ))}
+                {initialLevels
+                  .filter(l => !selectedCategory || l.categoryId === selectedCategory)
+                  .map(l => (
+                    <option key={l.id} value={l.id}>{l.name}</option>
+                  ))
+                }
+              </Select>
+            </div>
+          </div>
+          
+          <div className={styles.searchSortRow}>
+            <div className={styles.searchWrapper}>
+              <Search className={styles.searchIcon} size={18} />
+              <input 
+                type="text" 
+                placeholder="Öğrenci adı ile ara..." 
+                className={styles.searchInput}
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <div className={styles.sortWrapper}>
+              <ArrowUpDown size={16} />
+              <Select value={sortBy} onChange={e => setSortBy(e.target.value as any)} fullWidth={false}>
+                <option value="name">İsim (A-Z)</option>
+                <option value="class">Sınıf (Öncelik)</option>
+                <option value="level">Seviye (Öncelik)</option>
               </Select>
             </div>
           </div>
@@ -191,8 +238,23 @@ export function AttendanceClient({ initialClasses, initialLevels, prayerTimes }:
           );
         }
 
-        if (students.length === 0) {
-          return <div className={styles.emptyState}>Bu filtrelere uygun veya bu vakte girmesi gereken öğrenci bulunamadı.</div>;
+        const filteredStudents = students.filter(s => 
+          s.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+        ).sort((a, b) => {
+          if (sortBy === 'name') return a.fullName.localeCompare(b.fullName, 'tr');
+          if (sortBy === 'class') {
+            if (a.class.sortOrder !== b.class.sortOrder) return a.class.sortOrder - b.class.sortOrder;
+            return a.fullName.localeCompare(b.fullName, 'tr');
+          }
+          if (sortBy === 'level') {
+            if (a.level.sortOrder !== b.level.sortOrder) return a.level.sortOrder - b.level.sortOrder;
+            return a.fullName.localeCompare(b.fullName, 'tr');
+          }
+          return 0;
+        });
+
+        if (filteredStudents.length === 0) {
+          return <div className={styles.emptyState}>Aranan kriterlere uygun öğrenci bulunamadı.</div>;
         }
 
         return (
@@ -203,12 +265,15 @@ export function AttendanceClient({ initialClasses, initialLevels, prayerTimes }:
               initial="hidden"
               animate="show"
             >
-              {students.map(student => (
-                <motion.div 
-                  key={student.id} 
-                  className={styles.studentCard}
-                  variants={staggerItem}
-                >
+              <AnimatePresence mode="popLayout">
+                {filteredStudents.map(student => (
+                  <motion.div 
+                    layout
+                    key={student.id} 
+                    className={styles.studentCard}
+                    variants={staggerItem}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                  >
                   <div className={styles.studentInfo}>
                     <div className={styles.avatar}>
                       {student.fullName.charAt(0)}

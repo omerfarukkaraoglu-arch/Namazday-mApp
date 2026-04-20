@@ -20,6 +20,7 @@ export default async function LevelsPage() {
       description="Öğrencilerin gruplandığı seviyeleri tanımlayın (Örn: Lise, Hafızlık, LGS)."
       type="level"
       data={data.levels}
+      categories={data.categories}
     />
   );
 }

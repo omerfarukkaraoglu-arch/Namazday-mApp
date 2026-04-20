@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import { saveSetting, toggleSettingStatus, deleteSetting } from '@/actions/settings';
 import styles from './Yonetim.module.css';
 import { Plus, Edit, Power, PowerOff, Trash2 } from 'lucide-react';
+import { Select } from '@/components/ui/Select';
 
 export function GenericSettingsClient({ 
   title, 
@@ -19,9 +20,11 @@ export function GenericSettingsClient({
 }: { 
   title: string; 
   description: string; 
-  type: 'class' | 'level' | 'prayerTime'; 
-  data: any[] 
+  type: 'class' | 'level' | 'prayerTime' | 'category'; 
+  data: any[];
+  categories?: any[];
 }) {
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -29,7 +32,8 @@ export function GenericSettingsClient({
   const [formData, setFormData] = useState({
     name: '',
     sortOrder: 0,
-    isActive: true
+    isActive: true,
+    categoryId: ''
   });
 
   const openModal = (item: any = null) => {
@@ -38,14 +42,16 @@ export function GenericSettingsClient({
       setFormData({
         name: item.name,
         sortOrder: item.sortOrder,
-        isActive: item.isActive
+        isActive: item.isActive,
+        categoryId: item.categoryId || ''
       });
     } else {
       setEditItem(null);
       setFormData({
         name: '',
         sortOrder: data.length + 1,
-        isActive: true
+        isActive: true,
+        categoryId: ''
       });
     }
     setIsModalOpen(true);
@@ -101,6 +107,7 @@ export function GenericSettingsClient({
               <TableRow>
                 <TableHeader style={{ width: '80px' }}>Sıra</TableHeader>
                 <TableHeader>İsim</TableHeader>
+                {(type === 'class' || type === 'level') && <TableHeader>Kategori</TableHeader>}
                 <TableHeader>Durum</TableHeader>
                 <TableHeader style={{ textAlign: 'right' }}>İşlemler</TableHeader>
               </TableRow>
@@ -110,6 +117,11 @@ export function GenericSettingsClient({
                 <TableRow key={item.id} className={item.isActive ? styles.activeRow : styles.passiveRow}>
                   <TableCell><strong>{item.sortOrder}</strong></TableCell>
                   <TableCell>{item.name}</TableCell>
+                  {(type === 'class' || type === 'level') && (
+                    <TableCell>
+                      <Badge variant="secondary">{item.category?.name || '-'}</Badge>
+                    </TableCell>
+                  )}
                   <TableCell>
                     <Badge variant={item.isActive ? 'success' : 'danger'}>
                       {item.isActive ? 'Aktif' : 'Pasif'}
@@ -170,6 +182,19 @@ export function GenericSettingsClient({
             value={formData.sortOrder} 
             onChange={e => setFormData({...formData, sortOrder: parseInt(e.target.value)})} 
           />
+        
+          {(type === 'class' || type === 'level') && categories && (
+            <Select 
+              label="Kategori / Statü (Opsiyonel)" 
+              value={formData.categoryId} 
+              onChange={e => setFormData({...formData, categoryId: e.target.value})}
+            >
+              <option value="">Seçilmedi</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </Select>
+          )}
         
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>İptal</Button>

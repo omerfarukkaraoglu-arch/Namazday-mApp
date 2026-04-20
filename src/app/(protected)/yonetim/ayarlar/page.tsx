@@ -20,8 +20,10 @@ export default async function SettingsHubPage() {
     { title: 'Sistem Kullanıcıları', description: 'Öğretmenler, Yöneticiler, Yoklamacılar hesap ayarları.', href: '/yonetim/kullanicilar', icon: Users, color: '#3498db' },
     { title: 'Sınıf Yönetimi', description: 'Sınıfları ekleyin ve düzenleyin.', href: '/yonetim/siniflar', icon: School, color: '#2ecc71' },
     { title: 'Seviye Yönetimi', description: 'Öğrenci kademelerini, hafızlık seviyelerini belirleyin.', href: '/yonetim/seviyeler', icon: Layers, color: '#f39c12' },
+    { title: 'Kategori / Statü Yönetimi', description: 'Ortaokul, Lise gibi ana grupları belirleyin.', href: '/yonetim/kategoriler', icon: Building2, color: '#e74c3c' },
     { title: 'Yoklama Vakitleri', description: 'Günlük vakitleri ve ek ibadet türlerini oluşturun.', href: '/yonetim/vakitler', icon: Clock, color: '#9b59b6' },
   ];
+
 
 
   return (

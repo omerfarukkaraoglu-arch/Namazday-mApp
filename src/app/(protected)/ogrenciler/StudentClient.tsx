@@ -16,8 +16,8 @@ import { downloadStudentTemplate, fileToBase64 } from '@/lib/excelUtils';
 
 export function StudentClient({ students, classes, levels, isAdmin }: any) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterClass, setFilterClass] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<'name' | 'no' | 'class'>('name');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -31,6 +31,14 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
                         s.studentNo.includes(searchTerm);
     const matchClass = filterClass ? s.classId === filterClass : true;
     return matchSearch && matchClass;
+  }).sort((a: any, b: any) => {
+    if (sortBy === 'name') return a.fullName.localeCompare(b.fullName, 'tr');
+    if (sortBy === 'no') return a.studentNo.localeCompare(b.studentNo);
+    if (sortBy === 'class') {
+      if (a.class?.sortOrder !== b.class?.sortOrder) return (a.class?.sortOrder || 0) - (b.class?.sortOrder || 0);
+      return a.fullName.localeCompare(b.fullName, 'tr');
+    }
+    return 0;
   });
 
   const toggleSelect = (id: string) => {
@@ -180,6 +188,13 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
                 {classes.map((c: any) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
+              </Select>
+            </div>
+            <div className={styles.filterGroup}>
+              <Select value={sortBy} onChange={e => setSortBy(e.target.value as any)}>
+                <option value="name">İsim (A-Z)</option>
+                <option value="no">Öğrenci No</option>
+                <option value="class">Sınıf (Sıra No)</option>
               </Select>
             </div>
             <div className={styles.filterGroup} style={{ justifyContent: 'flex-end', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>

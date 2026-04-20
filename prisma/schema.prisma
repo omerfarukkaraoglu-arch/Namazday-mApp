@@ -22,6 +22,7 @@ model Institution {
   levels      Level[]
   prayerTimes PrayerTime[]
   attendances Attendance[]
+  categories  Category[]
 }
 
 model User {
@@ -50,6 +51,9 @@ model Class {
   institutionId String
   institution   Institution @relation(fields: [institutionId], references: [id])
   
+  categoryId String?
+  category   Category?   @relation(fields: [categoryId], references: [id])
+
   students  Student[]
   exemptPrayers PrayerTime[] @relation("ExcludedClasses")
 
@@ -66,7 +70,25 @@ model Level {
   institutionId String
   institution   Institution @relation(fields: [institutionId], references: [id])
   
+  categoryId String?
+  category   Category?   @relation(fields: [categoryId], references: [id])
+
   students  Student[]
+
+  @@unique([name, institutionId])
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+
+  classes Class[]
+  levels  Level[]
 
   @@unique([name, institutionId])
 }
