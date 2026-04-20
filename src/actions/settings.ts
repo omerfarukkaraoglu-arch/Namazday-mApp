@@ -130,7 +130,7 @@ export async function saveSetting(type: 'class' | 'level' | 'prayerTime' | 'cate
   }
 }
 
-export async function toggleSettingStatus(type: 'class' | 'level' | 'prayerTime', id: string, currentStatus: boolean) {
+export async function toggleSettingStatus(type: 'class' | 'level' | 'prayerTime' | 'category', id: string, currentStatus: boolean) {
   const user = await getUserContext();
   if (!user || !hasAdminPrivileges(user)) return { error: 'Yetkisiz işlem.' };
 
@@ -141,6 +141,8 @@ export async function toggleSettingStatus(type: 'class' | 'level' | 'prayerTime'
       await prisma.level.update({ where: { id, institutionId: user.institutionId }, data: { isActive: !currentStatus } });
     } else if (type === 'prayerTime') {
       await prisma.prayerTime.update({ where: { id, institutionId: user.institutionId }, data: { isActive: !currentStatus } });
+    } else {
+      await prisma.category.update({ where: { id, institutionId: user.institutionId }, data: { isActive: !currentStatus } });
     }
 
     revalidatePath(`/yonetim/siniflar`);
@@ -152,7 +154,7 @@ export async function toggleSettingStatus(type: 'class' | 'level' | 'prayerTime'
   }
 }
 
-export async function deleteSetting(type: 'class' | 'level' | 'prayerTime', id: string) {
+export async function deleteSetting(type: 'class' | 'level' | 'prayerTime' | 'category', id: string) {
   const user = await getUserContext();
   if (!user || !hasAdminPrivileges(user)) return { error: 'Yetkisiz işlem.' };
 
@@ -163,6 +165,8 @@ export async function deleteSetting(type: 'class' | 'level' | 'prayerTime', id: 
       await prisma.level.delete({ where: { id, institutionId: user.institutionId } });
     } else if (type === 'prayerTime') {
       await prisma.prayerTime.delete({ where: { id, institutionId: user.institutionId } });
+    } else {
+      await prisma.category.delete({ where: { id, institutionId: user.institutionId } });
     }
 
     revalidatePath(`/yonetim/siniflar`);

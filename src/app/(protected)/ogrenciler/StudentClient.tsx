@@ -16,6 +16,7 @@ import { downloadStudentTemplate, fileToBase64 } from '@/lib/excelUtils';
 
 export function StudentClient({ students, classes, levels, isAdmin }: any) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterClass, setFilterClass] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'name' | 'no' | 'class'>('name');
   

@@ -318,7 +318,8 @@ export function AttendanceClient({ initialClasses, initialLevels, categories, pr
                   </div>
                 </motion.div>
               ))}
-            </motion.div>
+            </AnimatePresence>
+          </motion.div>
 
             <div className={styles.actionBar}>
               <div className={styles.actionStats}>
