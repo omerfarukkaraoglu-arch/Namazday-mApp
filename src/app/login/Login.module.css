@@ -35,12 +35,14 @@
   width: 120px;
   height: 120px;
   object-fit: contain;
-  background-color: #0F172A; /* Logo arka planı */
-  border-radius: 50%;
-  padding: 10px;
+  border-radius: var(--radius-lg);
   margin-bottom: 1.5rem;
-  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
-  border: 2px solid rgba(255,255,255,0.05);
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.4));
+  transition: transform 0.3s ease;
+}
+
+.logoImg:hover {
+  transform: scale(1.05);
 }
 
 
