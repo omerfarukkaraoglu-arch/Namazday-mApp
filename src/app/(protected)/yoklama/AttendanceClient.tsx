@@ -35,20 +35,29 @@ export function AttendanceClient({ initialClasses, initialLevels, categories, pr
 
   // Vakit otomatik seçme (saate göre)
   useEffect(() => {
+    if (prayerTimes.length === 0 || selectedPrayer) return;
+
     const now = new Date();
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     
-    // Ayarlanmış saat aralıklarına göre uygun vakti bul
-    const matchingPrayer = prayerTimes.find(p => {
-      if (!p.startTime || !p.endTime) return false;
-      return currentTime >= p.startTime && currentTime <= p.endTime;
+    // Tüm vakitleri başlangıç saatine göre sıralayalım (Saat girilmemiş olanları sona atalım)
+    const sortedPrayers = [...prayerTimes].sort((a, b) => {
+      if (!a.startTime) return 1;
+      if (!b.startTime) return -1;
+      return a.startTime.localeCompare(b.startTime);
     });
 
-    if (matchingPrayer) {
-      setSelectedPrayer(matchingPrayer.id);
-    } else if (prayerTimes.length > 0 && !selectedPrayer) {
-      // Eğer aralığa düşen yoksa ve henüz seçim yapılmamışsa ilkini seç
-      setSelectedPrayer(prayerTimes[0].id);
+    // Mevcut saatten önce başlamış en son vakti bulalım
+    let latestMatchingPrayer = sortedPrayers[0]; // Varsayılan ilk vakit
+
+    for (const prayer of sortedPrayers) {
+      if (prayer.startTime && currentTime >= prayer.startTime) {
+        latestMatchingPrayer = prayer;
+      }
+    }
+
+    if (latestMatchingPrayer) {
+      setSelectedPrayer(latestMatchingPrayer.id);
     }
   }, [prayerTimes, selectedPrayer]);
 
