@@ -9,8 +9,30 @@ export async function getStudents() {
   const user = await getUserContext();
   if (!user) return [];
 
+  // Kullanıcının atamalarını veritabanından güncel halini çekelim
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { assignedClassId: true, assignedLevelId: true }
+  });
+
+  const whereClause: any = { 
+    institutionId: user.institutionId,
+    isActive: true 
+  };
+
+  // Eğer atama varsa OR mantığıyla filtreleyelim
+  if (dbUser && (dbUser.assignedClassId || dbUser.assignedLevelId)) {
+    whereClause.OR = [];
+    if (dbUser.assignedClassId) {
+      whereClause.OR.push({ classId: dbUser.assignedClassId });
+    }
+    if (dbUser.assignedLevelId) {
+      whereClause.OR.push({ levelId: dbUser.assignedLevelId });
+    }
+  }
+
   return await prisma.student.findMany({
-    where: { institutionId: user.institutionId },
+    where: whereClause,
     include: {
       class: true,
       level: true,

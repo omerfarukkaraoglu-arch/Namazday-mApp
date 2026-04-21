@@ -38,6 +38,11 @@ model User {
   institutionId String
   institution   Institution @relation(fields: [institutionId], references: [id])
   
+  assignedClassId String?
+  assignedClass   Class?   @relation("UserClassAssignment", fields: [assignedClassId], references: [id])
+  assignedLevelId String?
+  assignedLevel   Level?   @relation("UserLevelAssignment", fields: [assignedLevelId], references: [id])
+
   attendances  Attendance[]
 }
 
@@ -55,6 +60,7 @@ model Class {
   category   Category?   @relation(fields: [categoryId], references: [id])
 
   students  Student[]
+  assignedUsers User[]    @relation("UserClassAssignment")
   exemptPrayers PrayerTime[] @relation("ExcludedClasses")
 
   @@unique([name, institutionId])
@@ -74,6 +80,7 @@ model Level {
   category   Category?   @relation(fields: [categoryId], references: [id])
 
   students  Student[]
+  assignedUsers User[]    @relation("UserLevelAssignment")
 
   @@unique([name, institutionId])
 }

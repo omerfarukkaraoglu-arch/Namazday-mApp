@@ -40,7 +40,15 @@ export async function getStudentsForAttendance(prayerTimeId?: string, classId?: 
   const user = await getUserContext();
   if (!user) return [];
 
+  // Kullanıcının atamalarını çekelim
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { assignedClassId: true, assignedLevelId: true }
+  });
+
   const whereClause: any = { isActive: true, institutionId: user.institutionId };
+  
+  // UI'dan gelen filtreler
   if (classId) whereClause.classId = classId;
   if (levelId) whereClause.levelId = levelId;
   
@@ -49,6 +57,26 @@ export async function getStudentsForAttendance(prayerTimeId?: string, classId?: 
       { class: { categoryId: categoryId } },
       { level: { categoryId: categoryId } }
     ];
+  }
+
+  // Kullanıcının "Zorunlu" atamalarını en dışta AND ile bağlayalım
+  if (dbUser && (dbUser.assignedClassId || dbUser.assignedLevelId)) {
+    const assignmentFilters: any[] = [];
+    if (dbUser.assignedClassId) assignmentFilters.push({ classId: dbUser.assignedClassId });
+    if (dbUser.assignedLevelId) assignmentFilters.push({ levelId: dbUser.assignedLevelId });
+
+    // Mevcut whereClause'u bozmamak için AND içine alıyoruz
+    if (whereClause.OR) {
+      whereClause.AND = [
+        { OR: assignmentFilters },
+        { OR: whereClause.OR }
+      ];
+      delete whereClause.OR;
+    } else {
+      whereClause.AND = [
+        { OR: assignmentFilters }
+      ];
+    }
   }
 
   // Vakit bazlı muafiyet (Exemption) filtresi

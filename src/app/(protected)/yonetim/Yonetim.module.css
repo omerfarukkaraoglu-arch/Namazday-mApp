@@ -4,6 +4,18 @@
   gap: 1.5rem;
 }
 
+.assignmentBadges {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.miniBadge {
+  font-size: 0.75rem !important;
+  padding: 1px 6px !important;
+  width: fit-content;
+}
+
 .header {
   display: flex;
   justify-content: space-between;

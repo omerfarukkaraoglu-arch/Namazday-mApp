@@ -29,7 +29,11 @@ export async function getUsers() {
       institutionId: true,
       institution: {
         select: { name: true }
-      }
+      },
+      assignedClassId: true,
+      assignedLevelId: true,
+      assignedClass: { select: { name: true } },
+      assignedLevel: { select: { name: true } }
     },
     orderBy: { createdAt: 'desc' }
   });
@@ -44,6 +48,8 @@ export async function createOrUpdateUser(data: {
   password?: string;
   role: string;
   institutionId?: string; // SYSTEM_ADMIN tarafından set edilebilir
+  assignedClassId?: string | null;
+  assignedLevelId?: string | null;
 }) {
   const currentUser = await getUserContext();
   if (!currentUser || !hasAdminPrivileges(currentUser)) {
@@ -60,9 +66,10 @@ export async function createOrUpdateUser(data: {
   try {
     if (data.id) {
       const updateData: any = {
-        username: data.username,
         displayName: data.displayName,
-        role: data.role
+        role: data.role,
+        assignedClassId: data.assignedClassId,
+        assignedLevelId: data.assignedLevelId
       };
 
       // Sistem admini ise kurum değiştirmesine de izin veriyoruz
@@ -94,7 +101,9 @@ export async function createOrUpdateUser(data: {
           role: data.role,
           passwordHash,
           isActive: true,
-          institutionId: targetInstitutionId
+          institutionId: targetInstitutionId,
+          assignedClassId: data.assignedClassId,
+          assignedLevelId: data.assignedLevelId
         }
       });
     }

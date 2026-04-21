@@ -16,12 +16,16 @@ export function UsersClient({
   users, 
   currentUserId,
   institutions = [],
-  isSystemAdmin = false
+  isSystemAdmin = false,
+  classes = [],
+  levels = []
 }: { 
   users: any[], 
   currentUserId: string,
   institutions?: { id: string, name: string }[],
-  isSystemAdmin?: boolean
+  isSystemAdmin?: boolean,
+  classes?: any[],
+  levels?: any[]
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<any>(null);
@@ -32,7 +36,9 @@ export function UsersClient({
     displayName: '',
     password: '',
     role: 'YOKLAMACI',
-    institutionId: ''
+    institutionId: '',
+    assignedClassId: '',
+    assignedLevelId: ''
   });
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,7 +56,9 @@ export function UsersClient({
         displayName: user.displayName,
         password: '',
         role: user.role,
-        institutionId: user.institutionId || ''
+        institutionId: user.institutionId || '',
+        assignedClassId: user.assignedClassId || '',
+        assignedLevelId: user.assignedLevelId || ''
       });
     } else {
       setEditUser(null);
@@ -59,7 +67,9 @@ export function UsersClient({
         displayName: '',
         password: '',
         role: 'YOKLAMACI',
-        institutionId: institutions.length > 0 ? institutions[0].id : ''
+        institutionId: institutions.length > 0 ? institutions[0].id : '',
+        assignedClassId: '',
+        assignedLevelId: ''
       });
     }
     setIsModalOpen(true);
@@ -71,7 +81,9 @@ export function UsersClient({
 
     const result = await createOrUpdateUser({
       id: editUser?.id,
-      ...formData
+      ...formData,
+      assignedClassId: formData.assignedClassId || null,
+      assignedLevelId: formData.assignedLevelId || null
     });
 
     if (result.error) {
@@ -125,6 +137,7 @@ export function UsersClient({
                 <TableHeader>Kullanıcı Adı</TableHeader>
                 <TableHeader>Görünür İsim</TableHeader>
                 <TableHeader>Yetki</TableHeader>
+                <TableHeader>Sorumluluk</TableHeader>
                 {isSystemAdmin && <TableHeader>Bağlı Kurum</TableHeader>}
                 <TableHeader>Durum</TableHeader>
                 <TableHeader style={{ textAlign: 'right' }}>İşlemler</TableHeader>
@@ -144,6 +157,19 @@ export function UsersClient({
                       ) : (
                         <Badge variant="neutral"><User size={12} style={{marginRight:4}} /> YOKLAMACI</Badge>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <div className={styles.assignmentBadges}>
+                        {user.assignedClass && (
+                          <Badge variant="neutral" className={styles.miniBadge}>Sınıf: {user.assignedClass.name}</Badge>
+                        )}
+                        {user.assignedLevel && (
+                          <Badge variant="neutral" className={styles.miniBadge}>Seviye: {user.assignedLevel.name}</Badge>
+                        )}
+                        {!user.assignedClass && !user.assignedLevel && (
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Tümü</span>
+                        )}
+                      </div>
                     </TableCell>
                     {isSystemAdmin && (
                       <TableCell>
@@ -187,7 +213,7 @@ export function UsersClient({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={isSystemAdmin ? 6 : 5} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+                  <TableCell colSpan={isSystemAdmin ? 7 : 6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
                     Aranan kriterlere uygun kullanıcı bulunamadı.
                   </TableCell>
                 </TableRow>
@@ -238,6 +264,30 @@ export function UsersClient({
             <option value="admin">Kurum Admini</option>
             {isSystemAdmin && <option value="SYSTEM_ADMIN">Sistem Admini (Full Yetki)</option>}
           </Select>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <Select 
+              label="Sorumlu Sınıf" 
+              value={formData.assignedClassId} 
+              onChange={e => setFormData({...formData, assignedClassId: e.target.value})}
+            >
+              <option value="">-- Tüm Sınıflar --</option>
+              {classes.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </Select>
+
+            <Select 
+              label="Sorumlu Seviye" 
+              value={formData.assignedLevelId} 
+              onChange={e => setFormData({...formData, assignedLevelId: e.target.value})}
+            >
+              <option value="">-- Tüm Seviyeler --</option>
+              {levels.map(l => (
+                <option key={l.id} value={l.id}>{l.name}</option>
+              ))}
+            </Select>
+          </div>
 
           <div style={{ marginTop: '0.5rem' }}>
             <Input 
