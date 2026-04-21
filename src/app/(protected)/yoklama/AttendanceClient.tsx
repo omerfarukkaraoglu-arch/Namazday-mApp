@@ -68,10 +68,9 @@ export function AttendanceClient({ initialClasses, initialLevels, categories, pr
         // Map existing attendance
         const attendanceMap: Record<string, string> = {};
         
-        // Varsayılan olarak tüm öğrencileri YOK (veya boş) işaretleyebiliriz.
-        // Plan'a göre: Varsayılan Tümü "YOK"
+        // Varsayılan olarak tüm öğrencileri VAR işaretliyoruz (Kullanıcı isteği: Olmayanları işaretlemek daha kolay)
         studentData.forEach(s => {
-          attendanceMap[s.id] = 'YOK'; 
+          attendanceMap[s.id] = 'VAR'; 
         });
 
         // Eğer veritabanında varsa üzerine yaz
