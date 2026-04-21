@@ -35,18 +35,22 @@ export function AttendanceClient({ initialClasses, initialLevels, categories, pr
 
   // Vakit otomatik seçme (saate göre)
   useEffect(() => {
-    const hour = new Date().getHours();
-    let defaultPrayer = prayerTimes[0]?.id;
+    const now = new Date();
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     
-    // Daha gerçekçi vakit aralıkları (Kullanıcının erken vakit geçişi şikayeti üzerine güncellendi)
-    if (hour >= 4 && hour < 10) defaultPrayer = prayerTimes.find(p => p.name === 'Sabah')?.id || defaultPrayer;
-    else if (hour >= 10 && hour < 15) defaultPrayer = prayerTimes.find(p => p.name === 'Öğle')?.id || defaultPrayer;
-    else if (hour >= 15 && hour < 19) defaultPrayer = prayerTimes.find(p => p.name === 'İkindi')?.id || defaultPrayer;
-    else if (hour >= 19 && hour < 21) defaultPrayer = prayerTimes.find(p => p.name === 'Akşam')?.id || defaultPrayer;
-    else if (hour >= 21 || hour < 4) defaultPrayer = prayerTimes.find(p => p.name === 'Yatsı')?.id || defaultPrayer;
+    // Ayarlanmış saat aralıklarına göre uygun vakti bul
+    const matchingPrayer = prayerTimes.find(p => {
+      if (!p.startTime || !p.endTime) return false;
+      return currentTime >= p.startTime && currentTime <= p.endTime;
+    });
 
-    if (defaultPrayer) setSelectedPrayer(defaultPrayer);
-  }, [prayerTimes]);
+    if (matchingPrayer) {
+      setSelectedPrayer(matchingPrayer.id);
+    } else if (prayerTimes.length > 0 && !selectedPrayer) {
+      // Eğer aralığa düşen yoksa ve henüz seçim yapılmamışsa ilkini seç
+      setSelectedPrayer(prayerTimes[0].id);
+    }
+  }, [prayerTimes, selectedPrayer]);
 
   // Öğrencileri ve mevcut yoklamayı getir
   useEffect(() => {

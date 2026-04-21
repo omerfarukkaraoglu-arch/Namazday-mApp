@@ -129,6 +129,8 @@ model PrayerTime {
   isActive  Boolean      @default(true)
   activeDays String      @default("1,2,3,4,5,6,0")
   createdAt DateTime     @default(now())
+  startTime String?
+  endTime   String?
   
   institutionId String
   institution   Institution @relation(fields: [institutionId], references: [id])

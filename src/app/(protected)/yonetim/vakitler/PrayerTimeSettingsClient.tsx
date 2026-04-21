@@ -37,7 +37,9 @@ export function PrayerTimeSettingsClient({
     sortOrder: 0,
     isActive: true,
     activeDays: '1,2,3,4,5,6,0',
-    excludedClassIds: [] as string[]
+    excludedClassIds: [] as string[],
+    startTime: '',
+    endTime: ''
   });
 
   const openModal = (item: any = null) => {
@@ -48,7 +50,9 @@ export function PrayerTimeSettingsClient({
         sortOrder: item.sortOrder,
         isActive: item.isActive,
         activeDays: item.activeDays || '1,2,3,4,5,6,0',
-        excludedClassIds: item.excludedClasses?.map((c: any) => c.id) || []
+        excludedClassIds: item.excludedClasses?.map((c: any) => c.id) || [],
+        startTime: item.startTime || '',
+        endTime: item.endTime || ''
       });
     } else {
       setEditItem(null);
@@ -57,7 +61,9 @@ export function PrayerTimeSettingsClient({
         sortOrder: data.length + 1,
         isActive: true,
         activeDays: '1,2,3,4,5,6,0',
-        excludedClassIds: []
+        excludedClassIds: [],
+        startTime: '',
+        endTime: ''
       });
     }
     setIsModalOpen(true);
@@ -140,6 +146,7 @@ export function PrayerTimeSettingsClient({
               <TableRow>
                 <TableHeader style={{ width: '80px' }}>Sıra</TableHeader>
                 <TableHeader>Vakit İsmi</TableHeader>
+                <TableHeader>Saat Aralığı</TableHeader>
                 <TableHeader>Aktif Günler</TableHeader>
                 <TableHeader>Muaf Sınıflar</TableHeader>
                 <TableHeader>Durum</TableHeader>
@@ -151,6 +158,15 @@ export function PrayerTimeSettingsClient({
                 <TableRow key={item.id} className={item.isActive ? styles.activeRow : styles.passiveRow}>
                   <TableCell><strong>{item.sortOrder}</strong></TableCell>
                   <TableCell>{item.name}</TableCell>
+                  <TableCell>
+                    {item.startTime && item.endTime ? (
+                      <Badge variant="neutral" style={{ fontSize: '0.75rem' }}>
+                        {item.startTime} - {item.endTime}
+                      </Badge>
+                    ) : (
+                      <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>Ayarlanmamış</span>
+                    )}
+                  </TableCell>
                   <TableCell style={{ fontSize: '0.8rem' }}>{getDayLabels(item.activeDays)}</TableCell>
                   <TableCell>
                     {item.excludedClasses?.length > 0 ? (
@@ -208,14 +224,28 @@ export function PrayerTimeSettingsClient({
               value={formData.name} 
               onChange={e => setFormData({...formData, name: e.target.value})} 
             />
-            <Input 
-              type="number"
-              label="Sıra" 
-              required 
-              value={formData.sortOrder} 
-              onChange={e => setFormData({...formData, sortOrder: parseInt(e.target.value)})} 
             />
           </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+            <Input 
+              type="time"
+              label="Yoklama Başlangıç" 
+              required 
+              value={formData.startTime} 
+              onChange={e => setFormData({...formData, startTime: e.target.value})} 
+            />
+            <Input 
+              type="time"
+              label="Yoklama Bitiş" 
+              required 
+              value={formData.endTime} 
+              onChange={e => setFormData({...formData, endTime: e.target.value})} 
+            />
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.3rem' }}>
+            Yoklama ekranında otomatik vakit seçimi için bu aralık kullanılacaktır.
+          </p>
 
           <div style={{ marginTop: '1rem' }}>
             <label style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>Yoklama Alınacak Günler</label>

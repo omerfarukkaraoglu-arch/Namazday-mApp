@@ -47,6 +47,8 @@ export async function saveSetting(type: 'class' | 'level' | 'prayerTime' | 'cate
             sortOrder: parseInt(data.sortOrder), 
             isActive: data.isActive,
             activeDays: data.activeDays,
+            startTime: data.startTime || null,
+            endTime: data.endTime || null,
             excludedClasses: {
               set: data.excludedClassIds?.map((id: string) => ({ id })) || []
             }
@@ -86,6 +88,8 @@ export async function saveSetting(type: 'class' | 'level' | 'prayerTime' | 'cate
             sortOrder: parseInt(data.sortOrder), 
             isActive: data.isActive,
             activeDays: data.activeDays,
+            startTime: data.startTime || null,
+            endTime: data.endTime || null,
             institutionId: user.institutionId,
             excludedClasses: {
               connect: data.excludedClassIds?.map((id: string) => ({ id })) || []
