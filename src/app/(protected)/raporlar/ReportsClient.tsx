@@ -9,8 +9,10 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@
 import { Badge } from '@/components/ui/Badge';
 import { PieChart, Pie, Cell, Tooltip as PieTooltip, Legend as PieLegend, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as LineTooltip, Legend as LineLegend } from 'recharts';
 import { getReportStats } from '@/actions/reports';
-import { Filter, Download, FileSpreadsheet, FileText, AlertCircle, Calendar, Clock } from 'lucide-react';
+import { Filter, Download, FileSpreadsheet, FileText, AlertCircle, Calendar, Clock, CheckSquare, Users } from 'lucide-react';
 import { exportToExcel, exportToPDF } from '@/lib/exportUtils';
+import { motion } from 'framer-motion';
+import { staggerItem } from '@/components/ui/PageWrapper';
 import styles from './Raporlar.module.css';
 
 const COLORS = {
@@ -165,7 +167,7 @@ export function ReportsClient({
                 <option value="GOREVLI">GÖREVLİ</option>
               </Select>
             </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>
               <Button style={{ flex: 1, height: '42px' }} onClick={applyFilters} disabled={loading}>
                 <Filter size={18} /> {loading ? 'Yükleniyor...' : 'Filtrele'}
               </Button>
@@ -173,6 +175,47 @@ export function ReportsClient({
           </div>
         </CardContent>
       </Card>
+
+      {/* Genel Analiz İçgörüleri (Öğrenci seçili değilse gösterilir) */}
+      {!filters.studentId && stats.totalRecords > 0 && (
+        <div className={styles.insightsGrid}>
+          <motion.div variants={staggerItem} initial="hidden" animate="show">
+            <Card className={styles.insightCard}>
+              <div className={styles.insightIcon} style={{ background: 'rgba(39, 174, 96, 0.1)', color: '#27ae60' }}>
+                <CheckSquare size={20} />
+              </div>
+              <div className={styles.insightContent}>
+                <span className={styles.insightLabel}>Ortalama Devam</span>
+                <h3 className={styles.insightValue}>%{((stats.pieData.find((p:any) => p.name === 'VAR')?.value || 0) / stats.totalRecords * 100).toFixed(1)}</h3>
+              </div>
+            </Card>
+          </motion.div>
+          
+          <motion.div variants={staggerItem} initial="hidden" animate="show">
+            <Card className={styles.insightCard}>
+              <div className={styles.insightIcon} style={{ background: 'rgba(231, 76, 60, 0.1)', color: '#e74c3c' }}>
+                <AlertCircle size={20} />
+              </div>
+              <div className={styles.insightContent}>
+                <span className={styles.insightLabel}>Devamsızlık Oranı</span>
+                <h3 className={styles.insightValue}>%{((stats.pieData.find((p:any) => p.name === 'YOK')?.value || 0) / stats.totalRecords * 100).toFixed(1)}</h3>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div variants={staggerItem} initial="hidden" animate="show">
+            <Card className={styles.insightCard}>
+              <div className={styles.insightIcon} style={{ background: 'rgba(52, 152, 219, 0.1)', color: '#3498db' }}>
+                <Users size={20} />
+              </div>
+              <div className={styles.insightContent}>
+                <span className={styles.insightLabel}>Toplam Kayıt</span>
+                <h3 className={styles.insightValue}>{stats.totalRecords}</h3>
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      )}
 
       {/* Bireysel Karne Özeti */}
       {stats.absenteeismSummary && (
