@@ -342,8 +342,12 @@
   justify-content: center;
   gap: 0.15rem; /* Reduced gap to fit more items */
   color: var(--text-secondary);
-  transition: color 0.2s;
+  transition: all 0.2s;
   padding: 0.25rem 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
 }
 
 .mobileNavLinkActive {
