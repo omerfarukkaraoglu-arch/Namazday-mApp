@@ -224,6 +224,12 @@ export function PrayerTimeSettingsClient({
               value={formData.name} 
               onChange={e => setFormData({...formData, name: e.target.value})} 
             />
+            <Input 
+              type="number"
+              label="Sıra" 
+              required 
+              value={formData.sortOrder} 
+              onChange={e => setFormData({...formData, sortOrder: parseInt(e.target.value)})} 
             />
           </div>
           
