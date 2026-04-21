@@ -21,50 +21,61 @@
 
 .logoWrapper {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 5;
 }
 
-.svg {
-  width: 80px;
-  height: 80px;
-  z-index: 2;
+.logoImg {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  border-radius: 28px;
+  box-shadow: 0 0 50px rgba(212, 175, 55, 0.4);
 }
 
-.flare {
+.mainFlare {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.8) 0%, rgba(212, 175, 55, 0.3) 40%, transparent 70%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, 
+    rgba(212, 175, 55, 0.8) 0%, 
+    rgba(212, 175, 55, 0.4) 30%, 
+    rgba(212, 175, 55, 0.1) 60%, 
+    transparent 80%);
   border-radius: 50%;
   z-index: 1;
   pointer-events: none;
 }
 
-.logoFrame {
+.subGlow {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 2px solid rgba(212, 175, 55, 0.1);
-  border-radius: 30px;
-  background: rgba(255, 255, 255, 0.03);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, 
+    rgba(212, 175, 55, 0.15) 0%, 
+    transparent 70%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .brandName {
-  margin-top: 2rem;
-  font-size: 2.5rem;
+  margin-top: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 800;
   color: white;
   letter-spacing: -0.02em;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  font-family: 'Outfit', sans-serif;
 }
 
 .accent {

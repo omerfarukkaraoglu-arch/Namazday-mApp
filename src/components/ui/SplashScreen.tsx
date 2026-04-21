@@ -12,64 +12,56 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   return (
     <motion.div 
       className={styles.overlay}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: "easeInOut" }}
+      exit={{ opacity: 0, scale: 1.1 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className={styles.content}>
-        {/* Işık Patlaması (Flare) Efekti */}
+        {/* Güçlü Işık Patlaması (Radiation Effect) */}
         <motion.div 
-          className={styles.flare}
+          className={styles.mainFlare}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ 
-            scale: [0, 1.5, 2.2], 
-            opacity: [0, 0.8, 0] 
+            scale: [0, 1.2, 1.8], 
+            opacity: [0, 1, 0] 
           }}
           transition={{ 
-            delay: 1.2, 
-            duration: 0.8, 
+            duration: 1.2, 
             times: [0, 0.4, 1],
             ease: "easeOut" 
           }}
         />
 
-        <div className={styles.logoWrapper}>
-          {/* Tik Çizim Animasyonu */}
-          <svg 
-            viewBox="0 0 100 100" 
-            className={styles.svg}
-          >
-            <motion.path
-              d="M30 50 L45 65 L70 35"
-              fill="transparent"
-              strokeWidth="6"
-              stroke="#D4AF37"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ 
-                duration: 0.8, 
-                delay: 0.5, 
-                ease: "easeInOut" 
-              }}
-            />
-          </svg>
+        {/* İkincil Parıltı (Glow) */}
+        <motion.div 
+          className={styles.subGlow}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.5, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
 
-          {/* Logo Çerçevesi (Opsiyonel) */}
-          <motion.div 
-            className={styles.logoFrame}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+        <div className={styles.logoWrapper}>
+          {/* Kendi Logomuz /logo.png */}
+          <motion.img
+            src="/logo.png"
+            alt="Namazdayım Logo"
+            className={styles.logoImg}
+            initial={{ scale: 0, opacity: 0, rotate: -10 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            transition={{ 
+              type: "spring",
+              stiffness: 260,
+              damping: 20,
+              delay: 0.3
+            }}
           />
         </div>
 
         {/* Uygulama İsmi */}
         <motion.div
           className={styles.brandName}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5, duration: 0.6 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
         >
           <span className={styles.accent}>Namaz</span>dayım
         </motion.div>
