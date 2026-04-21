@@ -38,12 +38,12 @@ export function AttendanceClient({ initialClasses, initialLevels, categories, pr
     const hour = new Date().getHours();
     let defaultPrayer = prayerTimes[0]?.id;
     
-    // Basit bir saate göre vakit tahmini (varsayımsal saatler)
+    // Daha gerçekçi vakit aralıkları (Kullanıcının erken vakit geçişi şikayeti üzerine güncellendi)
     if (hour >= 4 && hour < 10) defaultPrayer = prayerTimes.find(p => p.name === 'Sabah')?.id || defaultPrayer;
-    else if (hour >= 10 && hour < 14) defaultPrayer = prayerTimes.find(p => p.name === 'Öğle')?.id || defaultPrayer;
-    else if (hour >= 14 && hour < 17) defaultPrayer = prayerTimes.find(p => p.name === 'İkindi')?.id || defaultPrayer;
-    else if (hour >= 17 && hour < 19) defaultPrayer = prayerTimes.find(p => p.name === 'Akşam')?.id || defaultPrayer;
-    else if (hour >= 19) defaultPrayer = prayerTimes.find(p => p.name === 'Yatsı')?.id || defaultPrayer;
+    else if (hour >= 10 && hour < 15) defaultPrayer = prayerTimes.find(p => p.name === 'Öğle')?.id || defaultPrayer;
+    else if (hour >= 15 && hour < 19) defaultPrayer = prayerTimes.find(p => p.name === 'İkindi')?.id || defaultPrayer;
+    else if (hour >= 19 && hour < 21) defaultPrayer = prayerTimes.find(p => p.name === 'Akşam')?.id || defaultPrayer;
+    else if (hour >= 21 || hour < 4) defaultPrayer = prayerTimes.find(p => p.name === 'Yatsı')?.id || defaultPrayer;
 
     if (defaultPrayer) setSelectedPrayer(defaultPrayer);
   }, [prayerTimes]);
