@@ -41,7 +41,8 @@ export function ReportsClient({
     studentId: '',
     classId: '',
     levelId: '',
-    prayerTimeId: ''
+    prayerTimeId: '',
+    status: ''
   });
   const [studentSearch, setStudentSearch] = useState('');
 
@@ -152,6 +153,16 @@ export function ReportsClient({
               <Select label="Vakit" value={filters.prayerTimeId} onChange={e => handleFilterChange('prayerTimeId', e.target.value)}>
                 <option value="">Tümü</option>
                 {options.prayerTimes.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </Select>
+            </div>
+            <div>
+              <Select label="Durum" value={filters.status} onChange={e => handleFilterChange('status', e.target.value)}>
+                <option value="">Tümü</option>
+                <option value="VAR">VAR</option>
+                <option value="YOK">YOK</option>
+                <option value="GEC">GEÇ</option>
+                <option value="IZINLI">İZİNLİ</option>
+                <option value="GOREVLI">GÖREVLİ</option>
               </Select>
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>

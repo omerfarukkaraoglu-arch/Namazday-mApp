@@ -40,6 +40,7 @@ export async function getReportStats(filters: {
   classId?: string;
   levelId?: string;
   prayerTimeId?: string;
+  status?: string;
 } = {}) {
   const user = await getUserContext();
   if (!user) return { pieData: [], trendData: [], totalRecords: 0, records: [] };
@@ -84,7 +85,7 @@ export async function getReportStats(filters: {
     orderBy: { date: 'desc' }
   });
 
-  // Genel Durum Dağılımı
+  // Genel Durum Dağılımı (Filtre uygulanmadan önceki tüm veriden hesaplanır - Pasta Grafiği için)
   const statusCounts = {
     VAR: 0,
     YOK: 0,
@@ -103,6 +104,12 @@ export async function getReportStats(filters: {
     name: key,
     value: statusCounts[key as keyof typeof statusCounts]
   })).filter(item => item.value > 0);
+
+  // Kayıtları status'e göre filtrele (eğer seçilmişse)
+  let filteredRecords = attendances;
+  if (filters.status) {
+    filteredRecords = attendances.filter(a => a.status === filters.status);
+  }
 
   const limit = 7; 
   const uniqueDates = Array.from(new Set(attendances.map(a => new Date(a.date).toISOString().split('T')[0])))
@@ -123,7 +130,7 @@ export async function getReportStats(filters: {
     };
   });
 
-  const prayerTimes = await prisma.prayerTime.findMany({
+  const prayerTimesList = await prisma.prayerTime.findMany({
     where: { institutionId: user.institutionId },
     orderBy: { sortOrder: 'asc' }
   });
@@ -136,7 +143,7 @@ export async function getReportStats(filters: {
 
     studentHistory = dates.map(dateStr => {
       const dayData: any = { date: dateStr };
-      prayerTimes.forEach(p => {
+      prayerTimesList.forEach(p => {
         const match = attendances.find(a => 
           new Date(a.date).toISOString().split('T')[0] === dateStr && a.prayerTimeId === p.id
         );
@@ -172,11 +179,11 @@ export async function getReportStats(filters: {
   return {
     pieData,
     trendData,
-    totalRecords: attendances.length,
-    records: attendances,
+    totalRecords: filteredRecords.length,
+    records: filteredRecords,
     studentHistory,
     absenteeismSummary,
-    prayerTimes
+    prayerTimes: prayerTimesList
   };
 }
 
