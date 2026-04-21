@@ -23,6 +23,8 @@ export const viewport = {
   userScalable: false,
 };
 
+import { InitialLoadProvider } from "@/components/providers/InitialLoadProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,7 +33,9 @@ export default function RootLayout({
   return (
     <html lang="tr" suppressHydrationWarning>
       <body>
-        {children}
+        <InitialLoadProvider>
+          {children}
+        </InitialLoadProvider>
       </body>
     </html>
   );
