@@ -20,7 +20,7 @@ interface AttendanceClientProps {
 
 export function AttendanceClient({ initialClasses, initialLevels, categories, prayerTimes }: AttendanceClientProps) {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [selectedPrayer, setSelectedPrayer] = useState(prayerTimes[0]?.id || '');
+  const [selectedPrayer, setSelectedPrayer] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
