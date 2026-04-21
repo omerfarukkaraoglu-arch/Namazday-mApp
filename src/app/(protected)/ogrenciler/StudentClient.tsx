@@ -27,6 +27,10 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
   const [editStudent, setEditStudent] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  const [formData, setFormData] = useState({
+    fullName: '', classId: '', levelId: '', parentName: '', parentPhone: ''
+  });
+
   const filteredStudents = students.filter((s: any) => {
     const matchSearch = s.fullName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchClass = filterClass ? s.classId === filterClass : true;
@@ -55,7 +59,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
   };
 
   const handleBulkDelete = async () => {
-    if (confirm(`${selectedIds.length} öğrenciyi TAMAMEN silmek istediğinize emin misiniz? Bu işlem geri alınamaz!`)) {
+    if (confirm(`${selectedIds.length} öğrenciyi TAMAMEN silmek istediğinize emin misiniz?`)) {
       setLoading(true);
       const res = await deleteStudents(selectedIds);
       if (res.error) alert(res.error);
@@ -70,15 +74,6 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
       const res = await bulkToggleStudentStatus(selectedIds, status);
       if (res.error) alert(res.error);
       else setSelectedIds([]);
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteSingle = async (id: string, name: string) => {
-    if (confirm(`'${name}' isimli öğrenciyi TAMAMEN silmek istediğinize emin misiniz?`)) {
-      setLoading(true);
-      const res = await deleteStudents([id]);
-      if (res.error) alert(res.error);
       setLoading(false);
     }
   };
@@ -101,10 +96,6 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
     }
     setIsModalOpen(true);
   };
-// ... (omitting form states and submit handlers for brevity, keeping only the return logic)
-  const [formData, setFormData] = useState({
-    fullName: '', classId: '', levelId: '', parentName: '', parentPhone: ''
-  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,6 +112,15 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
     }
   };
 
+  const handleDeleteSingle = async (id: string, name: string) => {
+    if (confirm(`'${name}' isimli öğrenciyi TAMAMEN silmek istediğinize emin misiniz?`)) {
+      setLoading(true);
+      const res = await deleteStudents([id]);
+      if (res.error) alert(res.error);
+      setLoading(false);
+    }
+  };
+
   const handleBulkSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (excelFile) {
@@ -130,12 +130,12 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
         const result = await bulkImportStudentsFromExcel(base64);
         if (result.error) alert(result.error);
         else {
-          alert(`Excel aktarımı başarılı! İşlenen: ${result.successCount}, Hatalı Satır: ${result.errorCount}`);
+          alert(`Aktarım başarılı! İşlenen: ${result.successCount}, Hatalı: ${result.errorCount}`);
           setExcelFile(null);
           setIsBulkModalOpen(false);
         }
       } catch (err) {
-        alert('Dosya okunurken bir hata oluştu.');
+        alert('Dosya işlenirken hata oluştu.');
       }
       setLoading(false);
     } else if (csvText.trim()) {
@@ -143,7 +143,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
       const result = await bulkImportStudents(csvText);
       if (result.error) alert(result.error);
       else {
-        alert(`Toplu ekleme başarılı! İşlenen: ${result.successCount}, Hatalı Satır: ${result.errorCount}`);
+        alert(`Aktarım başarılı! İşlenen: ${result.successCount}, Hatalı: ${result.errorCount}`);
         setCsvText('');
         setIsBulkModalOpen(false);
       }
@@ -193,13 +193,13 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
                 <option value="class">Sınıf (Sıra No)</option>
               </Select>
             </div>
-            <div className={styles.filterGroup} style={{ justifyContent: 'flex-end', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+            <div className={styles.filterGroup} style={{ justifyContent: 'flex-end', display: 'flex', gap: '0.5rem' }}>
                {isAdmin && (
                 <>
-                  <Button variant="secondary" onClick={() => setIsBulkModalOpen(true)} style={{ height: '2.5rem' }}>
+                  <Button variant="secondary" onClick={() => setIsBulkModalOpen(true)}>
                     <Upload size={18} /> Toplu İçe Aktar
                   </Button>
-                  <Button onClick={() => openModal()} style={{ height: '2.5rem' }}>
+                  <Button onClick={() => openModal()}>
                     <Plus size={18} /> Yeni Öğrenci
                   </Button>
                 </>
@@ -231,7 +231,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
               <TableBody>
                 {filteredStudents.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={isAdmin ? 6 : 5} style={{ textAlign: 'center', padding: '2rem' }}>
+                    <TableCell colSpan={isAdmin ? 5 : 4} style={{ textAlign: 'center', padding: '2rem' }}>
                       Kayıt bulunamadı.
                     </TableCell>
                   </TableRow>
@@ -299,7 +299,6 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
         </CardContent>
       </Card>
       
-      {/* Modals remain the same */}
       {isAdmin && (
         <Modal 
           isOpen={isModalOpen} 
@@ -348,7 +347,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
                 <FileSpreadsheet size={24} color="var(--primary)" />
                 <div>
                   <strong>Excel Taslağı Kullanın</strong>
-                  <p>Hata almamak için önceden hazırlanmış şablonu kullanmanızı öneririz.</p>
+                  <p>Numara alanı kaldırılmış yeni şablonu kullanın.</p>
                 </div>
               </div>
               <Button variant="secondary" size="sm" onClick={downloadStudentTemplate}>
@@ -362,7 +361,7 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
               <div className={styles.uploadArea}>
                 <label className={styles.fileLabel}>
                   <Upload size={20} />
-                  <span>{excelFile ? excelFile.name : 'Excel Dosyası Seçin veya Sürükleyin'}</span>
+                  <span>{excelFile ? excelFile.name : 'Excel Dosyası Seçin'}</span>
                   <input 
                     type="file" 
                     accept=".xlsx, .xls" 
@@ -378,9 +377,9 @@ export function StudentClient({ students, classes, levels, isAdmin }: any) {
                 className={styles.csvTextArea}
                 value={csvText}
                 onChange={(e) => { setCsvText(e.target.value); setExcelFile(null); }}
-                placeholder="Örnek: Ahmet Yılmaz, , 9-A, Lise Seviyesi"
+                placeholder="Örnek: Ahmet Yılmaz, 9-A, Lise Seviyesi"
               />
-              <p className={styles.helpText}>Kopyala-yapıştır ile hızlı ekleme yapabilirsiniz (Virgülle ayrılmış format).</p>
+              <p className={styles.helpText}>Sırasıyla: İsim Soyisim, Sınıf, Seviye</p>
 
               <div className={styles.modalActions}>
                 <Button type="button" variant="secondary" onClick={() => setIsBulkModalOpen(false)}>İptal</Button>

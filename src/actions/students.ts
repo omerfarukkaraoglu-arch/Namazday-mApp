@@ -40,7 +40,6 @@ export async function getClassesAndLevels() {
 export async function createOrUpdateStudent(data: {
   id?: string;
   fullName: string;
-  studentNo?: string;
   classId: string;
   levelId: string;
   parentName?: string;
@@ -57,7 +56,6 @@ export async function createOrUpdateStudent(data: {
         where: { id: data.id, institutionId: user.institutionId },
         data: {
           fullName: data.fullName,
-          studentNo: data.studentNo || null,
           classId: data.classId,
           levelId: data.levelId,
           parentName: data.parentName || null,
@@ -68,7 +66,6 @@ export async function createOrUpdateStudent(data: {
       await prisma.student.create({
         data: {
           fullName: data.fullName,
-          studentNo: data.studentNo || null,
           classId: data.classId,
           levelId: data.levelId,
           parentName: data.parentName || null,
@@ -83,7 +80,7 @@ export async function createOrUpdateStudent(data: {
     return { success: true };
   } catch (error) {
     console.error('Save student error:', error);
-    return { error: 'Öğrenci kaydedilirken beklenmeyen bir hata oluştu. (Numara daha önce kullanılmış olabilir)' };
+    return { error: 'Öğrenci kaydedilirken beklenmeyen bir hata oluştu.' };
   }
 }
 
@@ -120,12 +117,12 @@ export async function bulkImportStudents(csvText: string) {
       if (!line.trim()) continue;
       
       const parts = line.split(',').map(p => p.trim());
-      if (parts.length < 4) {
+      if (parts.length < 3) {
         errorCount++;
         continue;
       }
 
-      const [fullName, studentNo, className, levelName] = parts;
+      const [fullName, className, levelName] = parts;
 
       const classRecord = await prisma.class.upsert({
         where: { name_institutionId: { name: className, institutionId: user.institutionId } },
@@ -144,7 +141,6 @@ export async function bulkImportStudents(csvText: string) {
       await prisma.student.create({
         data: {
           fullName,
-          studentNo: studentNo || null,
           classId: classRecord.id,
           levelId: levelRecord.id,
           isActive: true,
@@ -244,7 +240,6 @@ export async function bulkImportStudentsFromExcel(base64Data: string) {
     for (const row of data) {
       try {
         const fullName = row['Ad Soyad'] || row['ad soyad'] || row['Full Name'];
-        const studentNo = row['Öğrenci No'] || row['öğrenci no'] || row['Student No'];
         const className = row['Sınıf'] || row['sınıf'] || row['Class'];
         const levelName = row['Seviye'] || row['seviye'] || row['Level'];
         const parentName = row['Veli Adı'] || row['veli adı'] || row['Parent Name'];
@@ -270,7 +265,6 @@ export async function bulkImportStudentsFromExcel(base64Data: string) {
         await prisma.student.create({
           data: {
             fullName: String(fullName),
-            studentNo: studentNo ? String(studentNo) : null,
             classId: classRecord.id,
             levelId: levelRecord.id,
             parentName: parentName ? String(parentName) : null,

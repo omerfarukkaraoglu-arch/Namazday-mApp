@@ -14,17 +14,17 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text);
 }
 
 .subtitle {
   margin: 0.25rem 0 0;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .addCard {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
 .addForm {
@@ -65,7 +65,8 @@
   height: 48px;
   border-radius: 8px;
   object-fit: cover;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .iconBox {
@@ -88,7 +89,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text);
 }
 
 .badgeActive, .badgeInactive {
@@ -107,8 +108,8 @@
   display: flex;
   gap: 1rem;
   padding: 1rem 0;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .statItem {
@@ -116,7 +117,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .actions {
@@ -148,7 +149,8 @@
 .modalCard {
   width: 100%;
   max-width: 500px;
-  background: white;
+  background: var(--surface);
+  border: 1px solid var(--border);
   animation: modalScale 0.2s ease-out;
 }
 
@@ -162,7 +164,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .modalHeader h3 { margin: 0; }
@@ -170,7 +172,7 @@
 .closeBtn {
   background: none;
   border: none;
-  color: #999;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 4px;
@@ -178,7 +180,7 @@
   align-items: center;
 }
 
-.closeBtn:hover { background: #f0f0f0; color: #333; }
+.closeBtn:hover { background: var(--surface-hover); color: var(--text); }
 
 .editForm {
   display: flex;
@@ -196,14 +198,14 @@
 .formGroup label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #333;
+  color: var(--text);
 }
 
 .logoUploadArea {
-  border: 2px dashed #e0e0e0;
+  border: 2px dashed var(--border);
   border-radius: 8px;
   padding: 1rem;
-  background: #fcfcfc;
+  background: var(--bg);
   transition: all 0.2s;
 }
 
@@ -247,8 +249,8 @@
   object-fit: contain;
   border-radius: 8px;
   padding: 0.5rem;
-  background: white;
-  border: 1px solid #eee;
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
 .removeLogoBtn {

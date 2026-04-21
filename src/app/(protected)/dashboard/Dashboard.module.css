@@ -98,8 +98,8 @@
 
 /* Spotlight & Celebration Styles */
 .spotlightCard {
-  border: 2px border var(--danger);
-  background: #fffafa;
+  border: 2px solid var(--danger);
+  background: rgba(231, 76, 60, 0.05);
 }
 
 .spotlightHeader {
@@ -156,7 +156,7 @@
 }
 
 .championItem {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.5rem;
@@ -216,7 +216,7 @@
 .trophyBox {
   width: 40px;
   height: 40px;
-  background: #fff9db;
+  background: rgba(241, 196, 15, 0.15);
   color: #f1c40f;
   border-radius: 50%;
   display: flex;
@@ -236,9 +236,9 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  background: #f0fff4;
-  border: 1px solid #c6f6d5;
-  color: #2f855a;
+  background: rgba(39, 174, 96, 0.1);
+  border: 1px solid rgba(39, 174, 96, 0.2);
+  color: var(--success);
   padding: 0.3rem 0.8rem;
   border-radius: 999px;
   font-size: 0.8rem;

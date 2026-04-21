@@ -4,10 +4,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, CheckSquare, Users, BarChart3, Settings, User, Building2, Menu, X, LogOut } from 'lucide-react';
 import styles from './Layout.module.css';
-import { hasAdminPrivileges, checkRole } from '@/lib/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/actions/auth';
+
+/**
+ * Mobil Navigasyon Bileşeni
+ * Düzen: Özet, Yoklama, Daha Fazla (Öğrenciler ve Raporlar Daha Fazla içerisine taşındı)
+ * Güncellendi: 21 Nisan 2026 - Force Refresh
+ */
 
 interface MobileNavProps {
   isAdmin: boolean;
@@ -20,14 +25,16 @@ export function MobileNav({ isAdmin, userRole, isSystemAdmin }: MobileNavProps) 
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
 
+  // Ana barda sadece en kritik 2 öğe yer alır
   const navItems = [
     { name: 'Özet', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Yoklama', href: '/yoklama', icon: CheckSquare },
-    { name: 'Öğrenciler', href: '/ogrenciler', icon: Users },
-    { name: 'Raporlar', href: '/raporlar', icon: BarChart3 },
   ];
 
+  // Diğer tüm öğeler "Daha Fazla" menüsünde
   const moreItems = [
+    { name: 'Öğrenciler', href: '/ogrenciler', icon: Users },
+    { name: 'Raporlar', href: '/raporlar', icon: BarChart3 },
     { name: 'Profilim', href: '/profil', icon: User },
   ];
 

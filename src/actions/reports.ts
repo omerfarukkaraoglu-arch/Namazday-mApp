@@ -10,7 +10,7 @@ export async function getFilterOptions() {
   const [students, classes, levels, prayerTimes] = await Promise.all([
     prisma.student.findMany({ 
       where: { institutionId: user.institutionId },
-      select: { id: true, fullName: true, studentNo: true, class: { select: { name: true } } }, 
+      select: { id: true, fullName: true, class: { select: { name: true } } }, 
       orderBy: { fullName: 'asc' } 
     }),
     prisma.class.findMany({ 
@@ -78,7 +78,7 @@ export async function getReportStats(filters: {
   const attendances = await prisma.attendance.findMany({
     where: whereClause,
     include: {
-      student: { select: { id: true, fullName: true, studentNo: true, class: true } },
+      student: { select: { id: true, fullName: true, class: true } },
       prayerTime: { select: { id: true, name: true } }
     },
     orderBy: { date: 'desc' }

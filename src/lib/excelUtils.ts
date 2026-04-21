@@ -2,7 +2,6 @@ import * as XLSX from 'xlsx';
 
 export const EXCEL_IMPORT_HEADERS = [
   'Ad Soyad',
-  'Öğrenci No',
   'Sınıf',
   'Seviye',
   'Veli Adı',
@@ -18,7 +17,6 @@ export const downloadStudentTemplate = () => {
   // Set column widths
   worksheet['!cols'] = [
     { wch: 25 }, // Ad Soyad
-    { wch: 15 }, // Öğrenci No
     { wch: 12 }, // Sınıf
     { wch: 20 }, // Seviye
     { wch: 20 }, // Veli Adı
@@ -40,7 +38,6 @@ export const fileToBase64 = (file: File): Promise<string> => {
     reader.readAsDataURL(file);
     reader.onload = () => {
       const base64String = reader.result as string;
-      // Remove data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,
       resolve(base64String.split(',')[1]);
     };
     reader.onerror = (error) => reject(error);

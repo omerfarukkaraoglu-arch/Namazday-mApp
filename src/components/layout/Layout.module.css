@@ -117,7 +117,7 @@
   max-height: 32px;
   object-fit: contain;
   border-radius: 6px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   flex-shrink: 0;
 }
