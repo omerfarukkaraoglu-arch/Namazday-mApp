@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, CheckSquare, Users, BarChart3, Settings, LogOut, Building2 } from 'lucide-react';
 import styles from './Layout.module.css';
@@ -65,14 +66,14 @@ export function Sidebar({ isAdmin, isSystemAdmin, institutionName, institutionLo
                              (item.href !== '/dashboard' || pathname === '/dashboard');
             return (
               <li key={item.href} className={styles.navItem}>
-                <a 
+                <Link 
                   href={item.href}
                   className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
                   style={{ cursor: 'pointer', zIndex: 50, position: 'relative' }}
                 >
                   <Icon size={20} className={styles.navIcon} />
                   <span>{item.name}</span>
-                </a>
+                </Link>
               </li>
             );
           })}

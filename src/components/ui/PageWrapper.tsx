@@ -9,7 +9,6 @@ export function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={pathname}
         initial={{ opacity: 0, y: 10, scale: 0.99 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -10, scale: 0.99 }}
