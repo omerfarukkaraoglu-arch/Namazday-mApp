@@ -68,7 +68,8 @@ export async function sendPushNotification(userId: string, payload: {
   const results = await Promise.allSettled(
     subscriptions.map(async (sub) => {
       try {
-        await webpush.sendNotification(
+        console.log(`Sending push to ${sub.endpoint}`);
+        const res = await webpush.sendNotification(
           {
             endpoint: sub.endpoint,
             keys: {
@@ -78,9 +79,11 @@ export async function sendPushNotification(userId: string, payload: {
           },
           JSON.stringify(payload)
         );
+        console.log(`Push success for ${sub.endpoint}:`, res.statusCode);
+        return res;
       } catch (error: any) {
+        console.error(`Push error for ${sub.endpoint}:`, error.statusCode, error.body);
         if (error.statusCode === 410 || error.statusCode === 404) {
-          // Subscription expired or invalid, delete it
           await prisma.pushSubscription.delete({ where: { id: sub.id } });
         }
         throw error;

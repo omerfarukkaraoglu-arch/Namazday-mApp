@@ -69,12 +69,16 @@ export function PushManager() {
         applicationServerKey: urlBase64ToUint8Array(publicKey)
       });
 
+      console.log('Push Subscription object:', subscription);
+
       const res = await subscribeUser(JSON.parse(JSON.stringify(subscription)));
       if (res.success) {
-        console.log('Push subscription successful');
+        console.log('Push subscription successfully saved to database');
+      } else {
+        console.error('Failed to save subscription:', res.error);
       }
     } catch (err) {
-      console.error('Push subscription failed:', err);
+      console.error('Push subscription failed error:', err);
     }
   }
 
