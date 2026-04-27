@@ -12,6 +12,7 @@ export function NotificationCenter() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [pushPermission, setPushPermission] = useState<string>('default');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = async () => {
@@ -24,6 +25,10 @@ export function NotificationCenter() {
   };
 
   useEffect(() => {
+    if ('Notification' in window) {
+      setPushPermission(Notification.permission);
+    }
+    
     fetchNotifications();
     // Refresh notifications every 2 minutes
     const interval = setInterval(fetchNotifications, 120000);
@@ -58,6 +63,20 @@ export function NotificationCenter() {
     }
   };
 
+  const handleEnablePush = async () => {
+    try {
+      const { enablePushNotifications } = await import('@/lib/push-client');
+      const res = await enablePushNotifications();
+      if (res.success) {
+        setPushPermission('granted');
+      } else {
+        alert('Bildirim izni alınamadı veya desteklenmiyor: ' + res.error);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'SUCCESS': return <CheckCircle size={18} />;
@@ -88,11 +107,22 @@ export function NotificationCenter() {
           <div className={styles.dropdown} ref={dropdownRef}>
             <div className={styles.header}>
               <h3>Bildirimler</h3>
-              {unreadCount > 0 && (
-                <button className={styles.markAllBtn} onClick={handleMarkAllAsRead}>
-                  Tümünü okundu işaretle
-                </button>
-              )}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                {pushPermission !== 'granted' && (
+                  <button 
+                    className={styles.markAllBtn} 
+                    onClick={handleEnablePush}
+                    style={{ color: 'var(--blue)', background: 'rgba(52, 152, 219, 0.1)' }}
+                  >
+                    Bildirimleri Aç
+                  </button>
+                )}
+                {unreadCount > 0 && (
+                  <button className={styles.markAllBtn} onClick={handleMarkAllAsRead}>
+                    Tümünü okundu işaretle
+                  </button>
+                )}
+              </div>
             </div>
             
             <div className={styles.list}>
