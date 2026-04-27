@@ -7,6 +7,7 @@ import { logout } from '@/actions/auth';
 import { PageWrapper } from '../ui/PageWrapper';
 import { hasAdminPrivileges, checkRole } from '@/lib/auth';
 import { BadgeManager } from '../notifications/BadgeManager';
+import { PushManager } from '../notifications/PushManager';
 import styles from './Layout.module.css';
 
 interface AppLayoutProps {
@@ -31,6 +32,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   return (
     <div className={styles.appContainer}>
       <BadgeManager />
+      <PushManager />
       {/* Desktop Sidebar */}
       <div className={styles.sidebarWrapper}>
         <Sidebar 

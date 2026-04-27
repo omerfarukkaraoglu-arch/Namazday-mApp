@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db';
 import { getUserContext } from '@/lib/auth-server';
 import { revalidatePath } from 'next/cache';
+import { sendPushNotification } from './push';
 
 export async function getNotifications() {
   const user = await getUserContext();
@@ -152,7 +153,7 @@ export async function createInternalNotification(data: {
   message: string;
   type?: string;
 }) {
-  return await prisma.notification.create({
+  const notification = await prisma.notification.create({
     data: {
       userId: data.userId,
       institutionId: data.institutionId,
@@ -161,4 +162,26 @@ export async function createInternalNotification(data: {
       type: data.type || 'INFO'
     }
   });
+
+  // Arka planda Push gönder
+  try {
+    const unreadCount = await prisma.notification.count({
+      where: { userId: data.userId, isRead: false }
+    });
+
+    sendPushNotification(data.userId, {
+      title: data.title,
+      body: data.message,
+      badge: '/icons/icon-96x96.png', // PWA ikonu
+      icon: '/icons/icon-192x192.png',
+      data: {
+        url: '/dashboard',
+        unreadCount: unreadCount
+      }
+    });
+  } catch (err) {
+    console.error('Push notification error:', err);
+  }
+
+  return notification;
 }
