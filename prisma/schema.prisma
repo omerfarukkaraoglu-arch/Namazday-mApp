@@ -23,6 +23,7 @@ model Institution {
   prayerTimes PrayerTime[]
   attendances Attendance[]
   categories  Category[]
+  notifications Notification[]
 }
 
 model User {
@@ -44,6 +45,7 @@ model User {
   assignedLevel   Level?   @relation("UserLevelAssignment", fields: [assignedLevelId], references: [id])
 
   attendances  Attendance[]
+  notifications Notification[]
 }
 
 model Class {
@@ -159,4 +161,19 @@ model Attendance {
   takenBy      User             @relation(fields: [takenById], references: [id])
 
   @@unique([studentId, prayerTimeId, date])
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  userId        String
+  title         String
+  message       String
+  type          String   @default("INFO") // INFO, WARNING, SUCCESS, ALERT
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
 }

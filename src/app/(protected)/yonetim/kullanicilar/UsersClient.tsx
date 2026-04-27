@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { createOrUpdateUser, toggleUserStatus, deleteUser } from '@/actions/users';
 import styles from '../Yonetim.module.css';
-import { Plus, Edit, Power, PowerOff, Shield, User, Trash2, Building2 } from 'lucide-react';
+import { Plus, Edit, Power, PowerOff, Shield, User, Trash2, Building2, BellRing } from 'lucide-react';
+import { SendNotificationModal } from './SendNotificationModal';
 
 export function UsersClient({ 
   users, 
@@ -30,6 +31,10 @@ export function UsersClient({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  
+  const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
+  const [notifyTarget, setNotifyTarget] = useState<{ id: string, displayName: string } | null>(null);
+  const [isBroadcast, setIsBroadcast] = useState(false);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -123,6 +128,9 @@ export function UsersClient({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <Button variant="secondary" onClick={() => { setIsBroadcast(true); setNotifyTarget(null); setIsNotifyModalOpen(true); }}>
+            <BellRing size={18} /> Toplu Bildirim
+          </Button>
           <Button onClick={() => openModal()}>
             <Plus size={18} /> Yeni Kullanıcı
           </Button>
@@ -197,6 +205,14 @@ export function UsersClient({
                           title={user.id === currentUserId ? 'Kendinizi pasif yapamazsınız' : ''}
                         >
                           {user.isActive ? <PowerOff size={16} /> : <Power size={16} />}
+                        </Button>
+                        <Button 
+                          variant="info" 
+                          size="sm" 
+                          onClick={() => { setNotifyTarget({ id: user.id, displayName: user.displayName }); setIsBroadcast(false); setIsNotifyModalOpen(true); }}
+                          title="Bildirim Gönder"
+                        >
+                          <BellRing size={16} />
                         </Button>
                         <Button 
                           variant="danger" 
@@ -306,6 +322,13 @@ export function UsersClient({
           </div>
         </form>
       </Modal>
+
+      <SendNotificationModal 
+        isOpen={isNotifyModalOpen}
+        onClose={() => setIsNotifyModalOpen(false)}
+        targetUser={notifyTarget}
+        isBroadcast={isBroadcast}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db';
 import { getUserContext } from '@/lib/auth-server';
 import { revalidatePath } from 'next/cache';
+import { createInternalNotification } from './notifications';
 
 export async function getClassesAndLevels() {
   const user = await getUserContext();
@@ -171,6 +172,16 @@ export async function saveAttendance(data: {
 
     revalidatePath('/yoklama');
     revalidatePath('/dashboard');
+
+    // Bildirim gönder
+    await createInternalNotification({
+      userId: user.id,
+      institutionId: user.institutionId,
+      title: 'Yoklama Kaydedildi',
+      message: 'Yoklama başarıyla kaydedildi. Gelmeyen öğrencileri kontrol etmeyi unutmayın.',
+      type: 'SUCCESS'
+    });
+
     return { success: true };
   } catch (error) {
     console.error('Save attendance error:', error);

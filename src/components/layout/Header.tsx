@@ -2,6 +2,7 @@
 import React from 'react';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { User } from 'lucide-react';
+import { NotificationCenter } from '../notifications/NotificationCenter';
 import styles from './Layout.module.css';
 import Link from 'next/link';
 
@@ -18,6 +19,7 @@ export function Header({ displayName }: HeaderProps) {
       </div>
       
       <div className={styles.headerActions}>
+        <NotificationCenter />
         <ThemeToggle />
         <Link href="/profil" className={styles.profileBtn}>
           <div className={styles.avatar}>
