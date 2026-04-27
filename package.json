@@ -9,10 +9,10 @@
     "lint": "eslint",
     "postinstall": "prisma generate"
   },
-
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "bcrypt": "^6.0.0",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.38.0",
     "jose": "^6.2.2",
     "jspdf": "^4.2.1",
@@ -39,4 +39,3 @@
     "seed": "node prisma/seed.js"
   }
 }
-
