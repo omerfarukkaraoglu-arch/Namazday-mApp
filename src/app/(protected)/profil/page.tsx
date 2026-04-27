@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { User, Shield, LogOut } from 'lucide-react';
 import { getUserContext } from '@/lib/auth-server';
 import { LogoutButton } from './LogoutButton'; // Client component for logout button
+import { NotificationSettings } from './NotificationSettings';
 import styles from './Profil.module.css';
 
 export const metadata = { title: 'Hesabım | Namazdayım' };
@@ -61,6 +62,10 @@ export default async function ProfilePage() {
                 </div>
               </div>
             </div>
+            
+            {/* Bildirim Ayarları */}
+            <NotificationSettings />
+            
           </CardContent>
         </Card>
 
