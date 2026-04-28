@@ -29,7 +29,7 @@ export function NotificationManagerClient({ users, institutionId }: Notification
 
     try {
       if (targetType === 'ALL') {
-        const result = await broadcastToInstitution(institutionId, title, message);
+        const result = await broadcastToInstitution({ title, message });
         if (result.success) {
           setSuccessMsg('Bildirim tüm kullanıcılara başarıyla gönderildi.');
           setTitle('');
@@ -43,7 +43,7 @@ export function NotificationManagerClient({ users, institutionId }: Notification
           setLoading(false);
           return;
         }
-        const result = await sendNotification(selectedUserId, title, message);
+        const result = await sendNotification({ userId: selectedUserId, title, message });
         if (result.success) {
           setSuccessMsg('Bildirim başarıyla gönderildi.');
           setTitle('');
