@@ -1,0 +1,106 @@
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.targetSelector {
+  display: flex;
+  gap: 1rem;
+}
+
+.targetOption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-secondary);
+}
+
+.targetOption:hover {
+  border-color: var(--primary-light);
+  background-color: var(--surface-hover);
+}
+
+.targetOption.active {
+  border-color: var(--primary);
+  background-color: rgba(30, 58, 95, 0.05); /* --primary with opacity */
+  color: var(--primary);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .targetOption.active {
+  background-color: rgba(93, 173, 226, 0.1);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.input, .textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.error {
+  padding: 0.75rem;
+  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--danger);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.success {
+  padding: 0.75rem;
+  background-color: rgba(39, 174, 96, 0.1);
+  color: var(--success);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  border: 1px solid rgba(39, 174, 96, 0.2);
+}
