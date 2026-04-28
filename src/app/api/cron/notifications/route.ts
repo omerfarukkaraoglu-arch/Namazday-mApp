@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { sendPushNotification } from '@/actions/push';
+import { sendOneSignalPush } from '@/lib/onesignal-server';
 
 export async function GET(request: Request) {
   // Vercel Cron Authentication
@@ -39,11 +39,7 @@ export async function GET(request: Request) {
 
         for (const admin of admins) {
           try {
-            await sendPushNotification(admin.id, {
-              title: 'Gün Sonu Raporu',
-              body: 'Bugünkü yoklama raporlarına ve devamsızlıklara göz atabilirsiniz.',
-              data: { url: '/raporlar' }
-            });
+            await sendOneSignalPush([admin.id], 'Gün Sonu Raporu', 'Bugünkü yoklama raporlarına ve devamsızlıklara göz atabilirsiniz.', '/raporlar');
             notificationsSent++;
           } catch (e) {}
         }
@@ -63,11 +59,7 @@ export async function GET(request: Request) {
           });
           for (const y of yoklamacilar) {
             try {
-              await sendPushNotification(y.id, {
-                title: 'Yoklama Vakti Yaklaşıyor',
-                body: `${pt.name} vakti için yoklama almayı unutmayın.`,
-                data: { url: '/yoklama' }
-              });
+              await sendOneSignalPush([y.id], 'Yoklama Vakti Yaklaşıyor', `${pt.name} vakti için yoklama almayı unutmayın.`, '/yoklama');
               notificationsSent++;
             } catch (e) {}
           }
@@ -80,11 +72,7 @@ export async function GET(request: Request) {
           });
           for (const u of adminsAndYoklamacilar) {
             try {
-              await sendPushNotification(u.id, {
-                title: 'Vakit Sona Erdi',
-                body: `${pt.name} vakti sona erdi. Alınmayan yoklamalarınız varsa lütfen tamamlayın.`,
-                data: { url: '/yoklama' }
-              });
+              await sendOneSignalPush([u.id], 'Vakit Sona Erdi', `${pt.name} vakti sona erdi. Alınmayan yoklamalarınız varsa lütfen tamamlayın.`, '/yoklama');
               notificationsSent++;
             } catch (e) {}
           }

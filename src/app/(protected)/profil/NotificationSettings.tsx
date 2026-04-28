@@ -2,23 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import { Bell, BellOff } from 'lucide-react';
-import { enablePushNotifications } from '@/lib/push-client';
-import { unsubscribeUser } from '@/actions/push';
+import OneSignal from 'react-onesignal';
 
 export function NotificationSettings() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkSubscription();
+    // Wait a bit for OneSignal to initialize
+    const timer = setTimeout(() => checkSubscription(), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const checkSubscription = async () => {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
+    if (typeof window !== 'undefined' && OneSignal.User) {
       try {
-        const registration = await navigator.serviceWorker.ready;
-        const sub = await registration.pushManager.getSubscription();
-        setIsSubscribed(!!sub);
+        const isOptedIn = OneSignal.User.PushSubscription.optedIn;
+        setIsSubscribed(!!isOptedIn);
       } catch (err) {
         console.error(err);
       }
@@ -30,22 +30,11 @@ export function NotificationSettings() {
     setLoading(true);
     try {
       if (isSubscribed) {
-        // Kapat (Unsubscribe)
-        const registration = await navigator.serviceWorker.ready;
-        const sub = await registration.pushManager.getSubscription();
-        if (sub) {
-          await unsubscribeUser(sub.endpoint);
-          await sub.unsubscribe();
-        }
+        await OneSignal.User.PushSubscription.optOut();
         setIsSubscribed(false);
       } else {
-        // Aç (Subscribe)
-        const res = await enablePushNotifications();
-        if (res.success) {
-          setIsSubscribed(true);
-        } else {
-          alert('Bildirim izni alınamadı veya engellendi: ' + res.error);
-        }
+        await OneSignal.Slidedown.promptPush();
+        setIsSubscribed(true);
       }
     } catch (err) {
       console.error(err);
@@ -60,7 +49,7 @@ export function NotificationSettings() {
           {isSubscribed ? <Bell size={20} /> : <BellOff size={20} />}
         </div>
         <div>
-          <div style={{ fontWeight: 600, color: 'var(--text)' }}>Cihaz Bildirimleri</div>
+          <div style={{ fontWeight: 600, color: 'var(--text)' }}>Cihaz Bildirimleri (OneSignal)</div>
           <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
             {isSubscribed ? 'Bu cihazda bildirimler açık' : 'Bu cihaz için kapalı'}
           </div>
@@ -89,3 +78,4 @@ export function NotificationSettings() {
     </div>
   );
 }
+

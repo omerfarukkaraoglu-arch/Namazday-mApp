@@ -27,6 +27,7 @@ export default async function ProtectedLayout({
   return (
     <AppLayout 
       user={{ 
+        id: user.id,
         username: user.username,
         displayName: user.displayName, 
         role: user.role, 

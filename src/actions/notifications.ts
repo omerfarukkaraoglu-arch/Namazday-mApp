@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/db';
 import { getUserContext } from '@/lib/auth-server';
 import { revalidatePath } from 'next/cache';
-import { sendPushNotification } from './push';
+import { sendOneSignalPush } from '@/lib/onesignal-server';
 
 export async function getNotifications() {
   const user = await getUserContext();
@@ -102,6 +102,9 @@ export async function sendNotification(data: {
       }
     });
 
+    // Send OneSignal Push
+    await sendOneSignalPush([data.userId], data.title, data.message);
+
     return { success: true };
   } catch (error) {
     console.error('Send notification error:', error);
@@ -138,6 +141,12 @@ export async function broadcastToInstitution(data: {
       }))
     });
 
+    // Send OneSignal Push
+    const userIds = users.map(u => u.id);
+    if (userIds.length > 0) {
+      await sendOneSignalPush(userIds, data.title, data.message);
+    }
+
     return { success: true, count: users.length };
   } catch (error) {
     console.error('Broadcast error:', error);
@@ -165,20 +174,7 @@ export async function createInternalNotification(data: {
 
   // Arka planda Push gönder
   try {
-    const unreadCount = await prisma.notification.count({
-      where: { userId: data.userId, isRead: false }
-    });
-
-    sendPushNotification(data.userId, {
-      title: data.title,
-      body: data.message,
-      badge: '/icons/icon-96x96.png', // PWA ikonu
-      icon: '/icons/icon-192x192.png',
-      data: {
-        url: '/dashboard',
-        unreadCount: unreadCount
-      }
-    });
+    await sendOneSignalPush([data.userId], data.title, data.message);
   } catch (err) {
     console.error('Push notification error:', err);
   }
