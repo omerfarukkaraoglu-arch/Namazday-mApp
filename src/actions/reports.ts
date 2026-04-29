@@ -5,9 +5,9 @@ import { getUserContext } from '@/lib/auth-server';
 
 export async function getFilterOptions() {
   const user = await getUserContext();
-  if (!user) return { students: [], classes: [], levels: [], prayerTimes: [] };
+  if (!user) return { students: [], classes: [], levels: [], prayerTimes: [], categories: [] };
 
-  const [students, classes, levels, prayerTimes] = await Promise.all([
+  const [students, classes, levels, prayerTimes, categories] = await Promise.all([
     prisma.student.findMany({ 
       where: { institutionId: user.institutionId },
       select: { id: true, fullName: true, class: { select: { name: true } } }, 
@@ -27,10 +27,15 @@ export async function getFilterOptions() {
       where: { institutionId: user.institutionId },
       select: { id: true, name: true }, 
       orderBy: { sortOrder: 'asc' } 
+    }),
+    prisma.category.findMany({
+      where: { institutionId: user.institutionId, isActive: true },
+      select: { id: true, name: true },
+      orderBy: { sortOrder: 'asc' }
     })
   ]);
 
-  return { students, classes, levels, prayerTimes };
+  return { students, classes, levels, prayerTimes, categories };
 }
 
 export async function getReportStats(filters: {
@@ -39,6 +44,7 @@ export async function getReportStats(filters: {
   studentId?: string;
   classId?: string;
   levelId?: string;
+  categoryId?: string;
   prayerTimeId?: string;
   status?: string;
 } = {}) {
@@ -68,6 +74,7 @@ export async function getReportStats(filters: {
     const studentFilter: any = { institutionId: user.institutionId };
     if (filters.classId) studentFilter.classId = filters.classId;
     if (filters.levelId) studentFilter.levelId = filters.levelId;
+    if (filters.categoryId) studentFilter.class = { categoryId: filters.categoryId };
     
     if (Object.keys(studentFilter).length > 1) {
       whereClause.student = studentFilter;

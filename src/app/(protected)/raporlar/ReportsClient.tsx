@@ -43,6 +43,7 @@ export function ReportsClient({
     studentId: '',
     classId: '',
     levelId: '',
+    categoryId: '',
     prayerTimeId: '',
     status: ''
   });
@@ -139,6 +140,12 @@ export function ReportsClient({
               </Select>
             </div>
 
+            <div>
+              <Select label="Kategori" value={filters.categoryId} onChange={e => handleFilterChange('categoryId', e.target.value)} disabled={!!filters.studentId}>
+                <option value="">Tümü</option>
+                {options.categories?.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </Select>
+            </div>
             <div>
               <Select label="Sınıf" value={filters.classId} onChange={e => handleFilterChange('classId', e.target.value)} disabled={!!filters.studentId}>
                 <option value="">Tümü</option>
