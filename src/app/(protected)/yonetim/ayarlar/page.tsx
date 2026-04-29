@@ -22,7 +22,7 @@ export default async function SettingsHubPage() {
     { title: 'Seviye Yönetimi', description: 'Öğrenci kademelerini, hafızlık seviyelerini belirleyin.', href: '/yonetim/seviyeler', icon: Layers, color: '#f39c12' },
     { title: 'Kategori / Statü Yönetimi', description: 'Ortaokul, Lise gibi ana grupları belirleyin.', href: '/yonetim/kategoriler', icon: Building2, color: '#e74c3c' },
     { title: 'Yoklama Vakitleri', description: 'Günlük vakitleri ve ek ibadet türlerini oluşturun.', href: '/yonetim/vakitler', icon: Clock, color: '#9b59b6' },
-    { title: 'Bildirim Yönetimi', description: 'Sistem kullanıcılarına toplu veya özel mesaj gönderin.', href: '/yonetim/ayarlar/bildirimler', icon: Layers, color: '#1abc9c' },
+    { title: 'Sistem Bildirimleri', description: 'Sistem kullanıcılarına toplu veya özel mesaj gönderin.', href: '/yonetim/ayarlar/bildirimler', icon: Layers, color: '#1abc9c' },
   ];
 
 

@@ -24,7 +24,7 @@ export default async function NotificationSettingsPage() {
     <div className={styles.container}>
       <header className={styles.header}>
         <div>
-          <h1 className={styles.title}>Bildirim Yönetimi</h1>
+          <h1 className={styles.title}>Sistem Bildirimleri</h1>
           <p className={styles.description}>Kurumunuzdaki kullanıcılara manuel bildirim gönderin.</p>
         </div>
       </header>
