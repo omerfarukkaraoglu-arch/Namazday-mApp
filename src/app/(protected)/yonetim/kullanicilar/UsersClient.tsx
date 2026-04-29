@@ -115,15 +115,15 @@ export function UsersClient({
           <h1 className={styles.title}>Sistem Kullanıcıları</h1>
           <p className={styles.description}>Sisteme girebilecek öğretmenler ve yöneticilerin hesapları.</p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div style={{ width: '250px' }}>
+        <div className={styles.headerActions} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', flex: '1 1 auto', justifyContent: 'flex-end' }}>
+          <div style={{ flex: '1 1 200px', minWidth: '200px', maxWidth: '300px' }}>
             <Input 
               placeholder="İsim veya kullanıcı adı ara..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button onClick={() => openModal()}>
+          <Button onClick={() => openModal()} style={{ whiteSpace: 'nowrap' }}>
             <Plus size={18} /> Yeni Kullanıcı
           </Button>
         </div>
