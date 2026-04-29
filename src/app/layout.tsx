@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   title: "Namazdayım",
   description: "Okul Namaz Yoklama ve Takip Sistemi",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icons/icon-192x192.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
