@@ -1,0 +1,109 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.button:hover {
+  border-color: var(--primary-light);
+}
+
+.button:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+  background-color: var(--surface);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--surface-hover);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownHeader {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--bg-secondary);
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.actionBtn:hover {
+  text-decoration: underline;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.option:hover {
+  background-color: var(--surface-hover);
+}
+
+.option input {
+  cursor: pointer;
+}
+
+.optionText {
+  font-size: 0.875rem;
+  color: var(--text);
+  flex: 1;
+}

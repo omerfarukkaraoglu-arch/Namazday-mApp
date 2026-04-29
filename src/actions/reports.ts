@@ -41,12 +41,12 @@ export async function getFilterOptions() {
 export async function getReportStats(filters: {
   startDate?: string;
   endDate?: string;
-  studentId?: string;
-  classId?: string;
-  levelId?: string;
-  categoryId?: string;
-  prayerTimeId?: string;
-  status?: string;
+  studentIds?: string[];
+  classIds?: string[];
+  levelIds?: string[];
+  categoryIds?: string[];
+  prayerTimeIds?: string[];
+  statuses?: string[];
 } = {}) {
   const user = await getUserContext();
   if (!user) return { pieData: [], trendData: [], totalRecords: 0, records: [] };
@@ -67,21 +67,21 @@ export async function getReportStats(filters: {
     }
   }
 
-  if (filters.studentId) {
-    whereClause.studentId = filters.studentId;
+  if (filters.studentIds && filters.studentIds.length > 0) {
+    whereClause.studentId = { in: filters.studentIds };
   } else {
     // If specific student not selected, apply class/level filters
     const studentFilter: any = { institutionId: user.institutionId };
-    if (filters.classId) studentFilter.classId = filters.classId;
-    if (filters.levelId) studentFilter.levelId = filters.levelId;
-    if (filters.categoryId) studentFilter.class = { categoryId: filters.categoryId };
+    if (filters.classIds && filters.classIds.length > 0) studentFilter.classId = { in: filters.classIds };
+    if (filters.levelIds && filters.levelIds.length > 0) studentFilter.levelId = { in: filters.levelIds };
+    if (filters.categoryIds && filters.categoryIds.length > 0) studentFilter.class = { categoryId: { in: filters.categoryIds } };
     
     if (Object.keys(studentFilter).length > 1) {
       whereClause.student = studentFilter;
     }
   }
   
-  if (filters.prayerTimeId) whereClause.prayerTimeId = filters.prayerTimeId;
+  if (filters.prayerTimeIds && filters.prayerTimeIds.length > 0) whereClause.prayerTimeId = { in: filters.prayerTimeIds };
 
   const attendances = await prisma.attendance.findMany({
     where: whereClause,
@@ -114,8 +114,8 @@ export async function getReportStats(filters: {
 
   // Kayıtları status'e göre filtrele (eğer seçilmişse)
   let filteredRecords = attendances;
-  if (filters.status) {
-    filteredRecords = attendances.filter(a => a.status === filters.status);
+  if (filters.statuses && filters.statuses.length > 0) {
+    filteredRecords = attendances.filter(a => filters.statuses!.includes(a.status));
   }
 
   const limit = 7; 
@@ -144,7 +144,7 @@ export async function getReportStats(filters: {
 
   // Öğrenci bazlı detaylı geçmiş (Matris yapısı)
   let studentHistory: any = null;
-  if (filters.studentId && attendances.length > 0) {
+  if (filters.studentIds?.length === 1 && attendances.length > 0) {
     const dates = Array.from(new Set(attendances.map(a => new Date(a.date).toISOString().split('T')[0])))
       .sort((a,b) => new Date(b).getTime() - new Date(a).getTime()); // Yeniden eskiye
 
@@ -162,7 +162,7 @@ export async function getReportStats(filters: {
 
   // Öğrenci bazlı özet devamsızlık (Karnesi)
   let absenteeismSummary: any = null;
-  if (filters.studentId && attendances.length > 0) {
+  if (filters.studentIds?.length === 1 && attendances.length > 0) {
     const totalAbsent = attendances.filter(a => a.status === 'YOK').length;
     
     const byPrayer: Record<string, number> = {};

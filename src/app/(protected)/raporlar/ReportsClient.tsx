@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { MultiSelect } from '@/components/ui/MultiSelect';
 import { Button } from '@/components/ui/Button';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
@@ -40,16 +41,16 @@ export function ReportsClient({
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
-    studentId: '',
-    classId: '',
-    levelId: '',
-    categoryId: '',
-    prayerTimeId: '',
-    status: ''
+    studentIds: [] as string[],
+    classIds: [] as string[],
+    levelIds: [] as string[],
+    categoryIds: [] as string[],
+    prayerTimeIds: [] as string[],
+    statuses: [] as string[]
   });
   const [studentSearch, setStudentSearch] = useState('');
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = (key: string, value: string | string[]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
@@ -77,9 +78,11 @@ export function ReportsClient({
 
   const getExportTitle = () => {
     let title = 'Genel Yoklama Raporu';
-    if (filters.studentId) {
-      const student = options.students.find((s: any) => s.id === filters.studentId);
+    if (filters.studentIds.length === 1) {
+      const student = options.students.find((s: any) => s.id === filters.studentIds[0]);
       title = `${student?.fullName || 'Öğrenci'} - Bireysel Rapor`;
+    } else if (filters.studentIds.length > 1) {
+      title = `Çoklu Öğrenci Raporu (${filters.studentIds.length} Öğrenci)`;
     }
     if (filters.startDate || filters.endDate) {
       title += ` (${filters.startDate || '...'} / ${filters.endDate || '...'})`;
@@ -99,12 +102,14 @@ export function ReportsClient({
     });
   };
 
+  const isStudentSelected = filters.studentIds.length > 0;
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>Gelişmiş Raporlar</h1>
-          <p className={styles.description}>Kriterlere göre filtreleyin, detayları analiz edin.</p>
+          <p className={styles.description}>Kriterlere göre filtreleyin, çoklu seçim yapın ve detayları analiz edin.</p>
         </div>
       </header>
 
@@ -127,52 +132,67 @@ export function ReportsClient({
                 onChange={e => setStudentSearch(e.target.value)}
                 style={{ marginBottom: '0.25rem' }}
               />
-              <Select 
-                value={filters.studentId} 
-                onChange={e => handleFilterChange('studentId', e.target.value)}
-              >
-                <option value="">Tümü ({options.students.length})</option>
-                {filteredStudents.map((s: any) => (
-                  <option key={s.id} value={s.id}>
-                    {s.fullName} ({s.class?.name || '?'})
-                  </option>
-                ))}
-              </Select>
+              <MultiSelect 
+                options={filteredStudents.map((s: any) => ({ value: s.id, label: `${s.fullName} (${s.class?.name || '?'})` }))}
+                selectedValues={filters.studentIds}
+                onChange={v => handleFilterChange('studentIds', v)}
+                placeholder="Tümü"
+              />
             </div>
 
             <div>
-              <Select label="Kategori" value={filters.categoryId} onChange={e => handleFilterChange('categoryId', e.target.value)} disabled={!!filters.studentId}>
-                <option value="">Tümü</option>
-                {options.categories?.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </Select>
+              <MultiSelect 
+                label="Kategori" 
+                options={options.categories?.map((c: any) => ({ value: c.id, label: c.name })) || []}
+                selectedValues={filters.categoryIds} 
+                onChange={v => handleFilterChange('categoryIds', v)} 
+                disabled={isStudentSelected}
+                placeholder="Tümü"
+              />
             </div>
             <div>
-              <Select label="Sınıf" value={filters.classId} onChange={e => handleFilterChange('classId', e.target.value)} disabled={!!filters.studentId}>
-                <option value="">Tümü</option>
-                {options.classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </Select>
+              <MultiSelect 
+                label="Sınıf" 
+                options={options.classes.map((c: any) => ({ value: c.id, label: c.name }))}
+                selectedValues={filters.classIds} 
+                onChange={v => handleFilterChange('classIds', v)} 
+                disabled={isStudentSelected}
+                placeholder="Tümü"
+              />
             </div>
             <div>
-              <Select label="Seviye" value={filters.levelId} onChange={e => handleFilterChange('levelId', e.target.value)} disabled={!!filters.studentId}>
-                <option value="">Tümü</option>
-                {options.levels?.map((l: any) => <option key={l.id} value={l.id}>{l.name}</option>)}
-              </Select>
+              <MultiSelect 
+                label="Seviye" 
+                options={options.levels?.map((l: any) => ({ value: l.id, label: l.name })) || []}
+                selectedValues={filters.levelIds} 
+                onChange={v => handleFilterChange('levelIds', v)} 
+                disabled={isStudentSelected}
+                placeholder="Tümü"
+              />
             </div>
             <div>
-              <Select label="Vakit" value={filters.prayerTimeId} onChange={e => handleFilterChange('prayerTimeId', e.target.value)}>
-                <option value="">Tümü</option>
-                {options.prayerTimes.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </Select>
+              <MultiSelect 
+                label="Vakit" 
+                options={options.prayerTimes.map((p: any) => ({ value: p.id, label: p.name }))}
+                selectedValues={filters.prayerTimeIds} 
+                onChange={v => handleFilterChange('prayerTimeIds', v)}
+                placeholder="Tümü"
+              />
             </div>
             <div>
-              <Select label="Durum" value={filters.status} onChange={e => handleFilterChange('status', e.target.value)}>
-                <option value="">Tümü</option>
-                <option value="VAR">VAR</option>
-                <option value="YOK">YOK</option>
-                <option value="GEC">GEÇ</option>
-                <option value="IZINLI">İZİNLİ</option>
-                <option value="GOREVLI">GÖREVLİ</option>
-              </Select>
+              <MultiSelect 
+                label="Durum" 
+                options={[
+                  { value: 'VAR', label: 'VAR' },
+                  { value: 'YOK', label: 'YOK' },
+                  { value: 'GEC', label: 'GEÇ' },
+                  { value: 'IZINLI', label: 'İZİNLİ' },
+                  { value: 'GOREVLI', label: 'GÖREVLİ' }
+                ]}
+                selectedValues={filters.statuses} 
+                onChange={v => handleFilterChange('statuses', v)}
+                placeholder="Tümü"
+              />
             </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>
               <Button style={{ flex: 1, height: '42px' }} onClick={applyFilters} disabled={loading}>
@@ -184,7 +204,7 @@ export function ReportsClient({
       </Card>
 
       {/* Genel Analiz İçgörüleri (Öğrenci seçili değilse gösterilir) */}
-      {!filters.studentId && stats.totalRecords > 0 && (
+      {!isStudentSelected && stats.totalRecords > 0 && (
         <div className={styles.insightsGrid}>
           <motion.div variants={staggerItem} initial="hidden" animate="show">
             <Card className={styles.insightCard}>
