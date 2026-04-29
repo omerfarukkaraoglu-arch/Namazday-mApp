@@ -181,3 +181,35 @@ export async function createInternalNotification(data: {
 
   return notification;
 }
+
+export async function deleteNotification(id: string) {
+  const user = await getUserContext();
+  if (!user) return { error: 'Oturum açmanız gerekiyor' };
+
+  try {
+    await prisma.notification.delete({
+      where: { id, userId: user.id }
+    });
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error('Delete notification error:', error);
+    return { error: 'Bildirim silinirken bir hata oluştu' };
+  }
+}
+
+export async function deleteAllNotifications() {
+  const user = await getUserContext();
+  if (!user) return { error: 'Oturum açmanız gerekiyor' };
+
+  try {
+    await prisma.notification.deleteMany({
+      where: { userId: user.id }
+    });
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error('Delete all notifications error:', error);
+    return { error: 'Bildirimler silinirken bir hata oluştu' };
+  }
+}

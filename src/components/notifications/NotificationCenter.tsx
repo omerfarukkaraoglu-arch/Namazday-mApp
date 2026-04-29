@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Check, Info, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import { getNotifications, markAsRead, markAllAsRead, getUnreadCount } from '@/actions/notifications';
+import { Bell, Check, Info, AlertTriangle, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { getNotifications, markAsRead, markAllAsRead, getUnreadCount, deleteNotification, deleteAllNotifications } from '@/actions/notifications';
 import styles from './Notifications.module.css';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -58,6 +58,28 @@ export function NotificationCenter() {
     }
   };
 
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Okundu olarak işaretlenmesini engelle
+    const result = await deleteNotification(id);
+    if (result.success) {
+      setNotifications(notifications.filter(n => n.id !== id));
+      // Eğer silinen bildirim okunmamışsa sayacı düşür
+      const isUnread = notifications.find(n => n.id === id && !n.isRead);
+      if (isUnread) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!window.confirm('Tüm bildirimleri silmek istediğinize emin misiniz?')) return;
+    const result = await deleteAllNotifications();
+    if (result.success) {
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  };
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'SUCCESS': return <CheckCircle size={18} />;
@@ -88,11 +110,18 @@ export function NotificationCenter() {
           <div className={styles.dropdown} ref={dropdownRef}>
             <div className={styles.header}>
               <h3>Bildirimler</h3>
-              {unreadCount > 0 && (
-                <button className={styles.markAllBtn} onClick={handleMarkAllAsRead}>
-                  Tümünü okundu işaretle
-                </button>
-              )}
+              <div className={styles.headerActions}>
+                {unreadCount > 0 && (
+                  <button className={styles.actionBtn} onClick={handleMarkAllAsRead} title="Tümünü okundu işaretle">
+                    <Check size={16} />
+                  </button>
+                )}
+                {notifications.length > 0 && (
+                  <button className={styles.actionBtn} onClick={handleDeleteAll} title="Tümünü sil" style={{ color: 'var(--danger)' }}>
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
             </div>
             
             <div className={styles.list}>
@@ -118,6 +147,13 @@ export function NotificationCenter() {
                       </div>
                       <p className={styles.itemMessage}>{notification.message}</p>
                     </div>
+                    <button 
+                      className={styles.deleteBtn} 
+                      onClick={(e) => handleDelete(e, notification.id)}
+                      title="Sil"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 ))
               )}

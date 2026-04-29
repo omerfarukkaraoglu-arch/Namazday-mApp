@@ -93,18 +93,28 @@
   font-weight: 600;
 }
 
-.markAllBtn {
-  background: none;
-  border: none;
-  color: var(--primary);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
+.headerActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-.markAllBtn:hover {
+.actionBtn {
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
   background: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary);
 }
 
 .list {
@@ -184,6 +194,29 @@
   right: 0;
   bottom: 0;
   z-index: 999;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.notificationItem:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }
 
 /* Types */
