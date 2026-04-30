@@ -36,6 +36,21 @@ export function ReportsClient({
 }) {
   const [stats, setStats] = useState(initialStats);
   const [loading, setLoading] = useState(false);
+
+  // Tarih formatlama yardımcısı
+  const formatTRDate = (date: Date | string | null) => {
+    if (!date) return '-';
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return String(date);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}.${month}.${year}`;
+    } catch (e) {
+      return String(date);
+    }
+  };
   
   // Filtre durumları
   const [filters, setFilters] = useState({
@@ -85,7 +100,9 @@ export function ReportsClient({
       title = `Çoklu Öğrenci Raporu (${filters.studentIds.length} Öğrenci)`;
     }
     if (filters.startDate || filters.endDate) {
-      title += ` (${filters.startDate || '...'} / ${filters.endDate || '...'})`;
+      const start = filters.startDate ? formatTRDate(filters.startDate) : '...';
+      const end = filters.endDate ? formatTRDate(filters.endDate) : '...';
+      title += ` (${start} / ${end})`;
     }
     return title;
   };
@@ -415,7 +432,7 @@ export function ReportsClient({
                   <TableBody>
                     {stats.records?.map((record: any) => (
                       <TableRow key={record.id}>
-                        <TableCell>{new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short' }).format(new Date(record.date))}</TableCell>
+                        <TableCell>{formatTRDate(record.date)}</TableCell>
                         <TableCell>
                           {record.student.fullName}
                         </TableCell>
