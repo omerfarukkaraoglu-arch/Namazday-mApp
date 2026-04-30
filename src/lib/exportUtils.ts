@@ -4,10 +4,20 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+const formatTRDate = (date: Date | string | null) => {
+  if (!date) return '-';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return String(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}.${month}.${year}`;
+};
+
 // Excel Export
 export const exportToExcel = (data: any[], fileName: string) => {
   const worksheetData = data.map(record => ({
-    'Tarih': new Intl.DateTimeFormat('tr-TR').format(new Date(record.date)),
+    'Tarih': formatTRDate(record.date),
     'Ad Soyad': record.student.fullName,
     'Sınıf': record.student.class?.name || '-',
     'Vakit': record.prayerTime.name,
@@ -36,7 +46,9 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
 
   const trFix = (str: string) => {
     if (!str) return '';
-    const charMap: any = { 'İ': 'I', 'ı': 'i', 'Ş': 'S', 'ş': 's', 'Ğ': 'G', 'ğ': 'g', 'Ü': 'U', 'ü': 'u', 'Ö': 'O', 'ö': 'o', 'Ç': 'C', 'ç': 'c' };
+    // ğ, ş, ı ve İ karakterleri standart fontlarda sorun çıkarabildiği için latinize ediyoruz.
+    // Ancak ö, ü, ç karakterleri genellikle daha iyi desteklendiği için onları koruyoruz.
+    const charMap: any = { 'İ': 'I', 'ı': 'i', 'Ş': 'S', 'ş': 's', 'Ğ': 'G', 'ğ': 'g' };
     let fixed = str;
     Object.keys(charMap).forEach(key => {
       fixed = fixed.replace(new RegExp(key, 'g'), charMap[key]);
@@ -78,7 +90,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
   doc.setFontSize(9);
   doc.setTextColor(148, 163, 184);
   doc.setFont('helvetica', 'normal');
-  doc.text(trFix(`Rapor Olusturulma: ${new Intl.DateTimeFormat('tr-TR', { dateStyle: 'long', timeStyle: 'short' }).format(new Date())}`), 14, currentY + 7);
+  doc.text(trFix(`Rapor Olusturulma: ${formatTRDate(new Date())}`), 14, currentY + 7);
   
   currentY += 20;
 
@@ -93,11 +105,11 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
     doc.setFontSize(10);
     doc.setTextColor(15, 23, 42);
     doc.setFont('helvetica', 'bold');
-    doc.text(trFix('GENEL DEGERLENDIRME OZETI'), 20, currentY + 10);
+    doc.text(trFix('GENEL DEĞERLENDİRME ÖZETİ'), 20, currentY + 10);
     
     doc.setFontSize(12);
     doc.setTextColor(231, 76, 60);
-    doc.text(trFix(`Toplam: ${options.summary.totalAbsent} Vakit Devamsizlik`), 20, currentY + 18);
+    doc.text(trFix(`Toplam: ${options.summary.totalAbsent} Vakit Devamsızlık`), 20, currentY + 18);
     
     doc.setFontSize(9);
     doc.setTextColor(71, 85, 105);
@@ -108,20 +120,20 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
     const recentMissed = options.summary.missedDates.slice(0, 4).map(m => `${m.date} ${m.prayer}`).join(', ');
     doc.setFontSize(8);
     doc.setTextColor(148, 163, 184);
-    doc.text(trFix(`Son Kayitlar: ${recentMissed}...`), 20, currentY + 33);
+    doc.text(trFix(`Son Kayıtlar: ${recentMissed}...`), 20, currentY + 33);
     
     currentY += 50;
   }
 
   const tableRows = data.map(record => [
-    new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short' }).format(new Date(record.date)),
+    formatTRDate(record.date),
     trFix(record.student.fullName),
     trFix(record.student.class?.name || '-'),
     trFix(record.prayerTime.name),
     trFix(record.status)
   ]);
 
-  const tableColumn = ["Tarih", "Ad Soyad", "Sinif", "Vakit", "Durum"];
+  const tableColumn = ["Tarih", "Ad Soyad", "Sınıf", "Vakit", "Durum"];
 
   autoTable(doc, {
     startY: currentY,
@@ -153,7 +165,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
       doc.setFontSize(8);
       doc.setTextColor(148, 163, 184);
       doc.text(
-        trFix('Bu rapor Namazdayim Akilli Takip Sistemi tarafindan otomatik olusturulmustur.'), 
+        trFix('Bu rapor Namazdayım Akıllı Takip Sistemi tarafından otomatik oluşturulmuştur.'), 
         14, 
         pageHeight - 10
       );
