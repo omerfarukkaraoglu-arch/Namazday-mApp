@@ -133,7 +133,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
     trFix(record.status)
   ]);
 
-  const tableColumn = ["Tarih", "Ad Soyad", "Sınıf", "Vakit", "Durum"];
+  const tableColumn = ["Tarih", "Ad Soyad", "Sınıf", "Vakit", "Durum"].map(h => trFix(h));
 
   autoTable(doc, {
     startY: currentY,
