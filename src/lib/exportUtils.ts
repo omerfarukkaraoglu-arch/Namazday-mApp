@@ -179,6 +179,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
       const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
       doc.setFontSize(8);
       doc.setTextColor(148, 163, 184);
+      doc.setFont('Geist', 'normal');
       doc.text(
         trFix('Bu rapor Namazdayım Akıllı Takip Sistemi tarafından otomatik oluşturulmuştur.'), 
         14, 
