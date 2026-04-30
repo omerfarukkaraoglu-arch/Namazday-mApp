@@ -158,6 +158,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
       fillColor: [30, 58, 95], 
       textColor: 255, 
       fontStyle: 'bold',
+      font: 'Geist',
       halign: 'center'
     },
     bodyStyles: { 
