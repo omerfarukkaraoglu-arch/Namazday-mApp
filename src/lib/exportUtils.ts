@@ -14,6 +14,14 @@ const formatTRDate = (date: Date | string | null) => {
   return `${day}.${month}.${year}`;
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  'VAR': 'VAR',
+  'YOK': 'YOK',
+  'GEC': 'GEÇ',
+  'IZINLI': 'İZİNLİ',
+  'GOREVLI': 'GÖREVLİ'
+};
+
 // Excel Export
 export const exportToExcel = (data: any[], fileName: string) => {
   const worksheetData = data.map(record => ({
@@ -21,7 +29,7 @@ export const exportToExcel = (data: any[], fileName: string) => {
     'Ad Soyad': record.student.fullName,
     'Sınıf': record.student.class?.name || '-',
     'Vakit': record.prayerTime.name,
-    'Durum': record.status
+    'Durum': STATUS_LABELS[record.status] || record.status
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -130,7 +138,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
     trFix(record.student.fullName),
     trFix(record.student.class?.name || '-'),
     trFix(record.prayerTime.name),
-    trFix(record.status)
+    trFix(STATUS_LABELS[record.status] || record.status)
   ]);
 
   const tableColumn = ["Tarih", "Ad Soyad", "Sınıf", "Vakit", "Durum"].map(h => trFix(h));
