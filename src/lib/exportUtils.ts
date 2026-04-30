@@ -61,6 +61,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
   try {
     doc.addFileToVFS('Geist-Regular.ttf', GEIST_REGULAR_BASE64);
     doc.addFont('Geist-Regular.ttf', 'Geist', 'normal');
+    doc.addFont('Geist-Regular.ttf', 'Geist', 'bold');
     doc.setFont('Geist');
   } catch (e) {
     console.error('Font load error:', e);
