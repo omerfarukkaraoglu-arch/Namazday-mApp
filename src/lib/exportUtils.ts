@@ -3,6 +3,7 @@
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { GEIST_REGULAR_BASE64 } from './fontData';
 
 const formatTRDate = (date: Date | string | null) => {
   if (!date) return '-';
@@ -55,17 +56,18 @@ export interface PDFOptions {
 // PDF Export with Turkish Font Support (Latinization Fallback for Clean Output)
 export const exportToPDF = (data: any[], fileName: string, title: string, options?: PDFOptions) => {
   const doc = new jsPDF();
+  
+  // Register and set custom font for Turkish support
+  try {
+    doc.addFileToVFS('Geist-Regular.ttf', GEIST_REGULAR_BASE64);
+    doc.addFont('Geist-Regular.ttf', 'Geist', 'normal');
+    doc.setFont('Geist');
+  } catch (e) {
+    console.error('Font load error:', e);
+  }
 
   const trFix = (str: string) => {
-    if (!str) return '';
-    // ğ, ş, ı ve İ karakterleri standart fontlarda sorun çıkarabildiği için latinize ediyoruz.
-    // Ancak ö, ü, ç karakterleri genellikle daha iyi desteklendiği için onları koruyoruz.
-    const charMap: any = { 'İ': 'I', 'ı': 'i', 'Ş': 'S', 'ş': 's', 'Ğ': 'G', 'ğ': 'g' };
-    let fixed = str;
-    Object.keys(charMap).forEach(key => {
-      fixed = fixed.replace(new RegExp(key, 'g'), charMap[key]);
-    });
-    return fixed;
+    return str || '';
   };
 
   let currentY = 20;
@@ -81,12 +83,12 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
   
   doc.setFontSize(22);
   doc.setTextColor(30, 58, 95); // Deep Sapphire
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('Geist', 'bold');
   doc.text(trFix(options?.institutionName || 'NAMAZDAYIM'), options?.institutionLogo ? 36 : 14, 22);
   
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('Geist', 'normal');
   doc.text(trFix('Yoklama Takip ve Analiz Sistemi'), options?.institutionLogo ? 36 : 14, 28);
   
   doc.setDrawColor(226, 232, 240);
@@ -96,13 +98,13 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
   
   doc.setFontSize(14);
   doc.setTextColor(30, 41, 59);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('Geist', 'bold');
   doc.text(trFix(title), 14, currentY);
   
   doc.setFontSize(9);
   doc.setTextColor(148, 163, 184);
-  doc.setFont('helvetica', 'normal');
-  doc.text(trFix(`Rapor Olusturulma: ${formatTRDate(new Date())}`), 14, currentY + 7);
+  doc.setFont('Geist', 'normal');
+  doc.text(trFix(`Rapor Oluşturulma: ${formatTRDate(new Date())}`), 14, currentY + 7);
   
   currentY += 20;
 
@@ -116,7 +118,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
     
     doc.setFontSize(10);
     doc.setTextColor(15, 23, 42);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('Geist', 'bold');
     doc.text(trFix('GENEL DEĞERLENDİRME ÖZETİ'), 20, currentY + 10);
     
     doc.setFontSize(12);
@@ -125,7 +127,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
     
     doc.setFontSize(9);
     doc.setTextColor(71, 85, 105);
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('Geist', 'normal');
     const prayerSummary = options.summary.byPrayer.map(p => `${p.name}: ${p.count}`).join('  |  ');
     doc.text(trFix(prayerSummary), 20, currentY + 26);
 
@@ -160,7 +162,7 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
     },
     bodyStyles: { 
       fontSize: 9, 
-      font: 'helvetica',
+      font: 'Geist',
       textColor: [51, 65, 85]
     },
     columnStyles: {
