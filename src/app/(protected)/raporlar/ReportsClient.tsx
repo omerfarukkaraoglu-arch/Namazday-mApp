@@ -10,8 +10,8 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@
 import { Badge } from '@/components/ui/Badge';
 import { PieChart, Pie, Cell, Tooltip as PieTooltip, Legend as PieLegend, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as LineTooltip, Legend as LineLegend } from 'recharts';
 import { getReportStats } from '@/actions/reports';
-import { Filter, Download, FileSpreadsheet, FileText, AlertCircle, Calendar, Clock, CheckSquare, Users } from 'lucide-react';
-import { exportToExcel, exportToPDF } from '@/lib/exportUtils';
+import { Filter, Download, FileSpreadsheet, FileText, AlertCircle, Calendar, Clock, CheckSquare, Users, LayoutGrid, List } from 'lucide-react';
+import { exportToExcel, exportToPDF, exportKarnePDF } from '@/lib/exportUtils';
 import { motion } from 'framer-motion';
 import { staggerItem } from '@/components/ui/PageWrapper';
 import styles from './Raporlar.module.css';
@@ -36,6 +36,7 @@ export function ReportsClient({
 }) {
   const [stats, setStats] = useState(initialStats);
   const [loading, setLoading] = useState(false);
+  const [viewType, setViewType] = useState<'list' | 'karne'>('karne'); // Default to Karne as requested
 
   // Tarih formatlama yardımcısı
   const formatTRDate = (date: Date | string | null) => {
@@ -116,11 +117,18 @@ export function ReportsClient({
   };
 
   const handlePDFExport = () => {
-    exportToPDF(stats.records, `Namazdayim_Rapor_${new Date().getTime()}`, getExportTitle(), {
-      institutionName: branding.name,
-      institutionLogo: branding.logo,
-      summary: stats.absenteeismSummary
-    });
+    if (viewType === 'karne' && stats.groupedRecords) {
+      exportKarnePDF(stats.groupedRecords, `Namazdayim_Karne_${new Date().getTime()}`, getExportTitle(), {
+        institutionName: branding.name,
+        institutionLogo: branding.logo
+      });
+    } else {
+      exportToPDF(stats.records, `Namazdayim_Rapor_${new Date().getTime()}`, getExportTitle(), {
+        institutionName: branding.name,
+        institutionLogo: branding.logo,
+        summary: stats.absenteeismSummary
+      });
+    }
   };
 
   const isStudentSelected = filters.studentIds.length > 0;
@@ -411,43 +419,98 @@ export function ReportsClient({
 
           <Card>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <CardHeader>Filtrelenmiş Kayıtlar ({stats.totalRecords} Kayıt)</CardHeader>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <Button variant="secondary" size="sm" onClick={handleExcelExport} style={{ borderColor: '#27ae60', color: '#27ae60' }}>
-                  <FileSpreadsheet size={16} style={{ marginRight: '4px' }} /> Excel
-                </Button>
-                <Button variant="secondary" size="sm" onClick={handlePDFExport} style={{ borderColor: '#e74c3c', color: '#e74c3c' }}>
-                  <FileText size={16} style={{ marginRight: '4px' }} /> PDF
-                </Button>
+              <CardHeader>
+                {viewType === 'list' 
+                  ? `Filtrelenmiş Kayıtlar (${stats.totalRecords} Kayıt)` 
+                  : `Analiz ve Karne Özeti (${stats.groupedRecords?.length || 0} Öğrenci)`}
+              </CardHeader>
+              
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                {/* Görünüm Değiştirici */}
+                <div className={styles.viewToggle}>
+                  <button 
+                    className={`${styles.toggleBtn} ${viewType === 'karne' ? styles.toggleBtnActive : ''}`}
+                    onClick={() => setViewType('karne')}
+                    title="Karne Görünümü"
+                  >
+                    <LayoutGrid size={18} />
+                  </button>
+                  <button 
+                    className={`${styles.toggleBtn} ${viewType === 'list' ? styles.toggleBtnActive : ''}`}
+                    onClick={() => setViewType('list')}
+                    title="Liste Görünümü"
+                  >
+                    <List size={18} />
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <Button variant="secondary" size="sm" onClick={handleExcelExport} style={{ borderColor: '#27ae60', color: '#27ae60' }}>
+                    <FileSpreadsheet size={16} style={{ marginRight: '4px' }} /> Excel
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={handlePDFExport} style={{ borderColor: '#e74c3c', color: '#e74c3c' }}>
+                    <FileText size={16} style={{ marginRight: '4px' }} /> PDF
+                  </Button>
+                </div>
               </div>
             </div>
             <CardContent>
-              <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableHeader>Tarih</TableHeader>
-                      <TableHeader>Öğrenci</TableHeader>
-                      <TableHeader>Sınıf</TableHeader>
-                      <TableHeader>Vakit</TableHeader>
-                      <TableHeader>Durum</TableHeader>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {stats.records?.map((record: any) => (
-                      <TableRow key={record.id}>
-                        <TableCell>{formatTRDate(record.date)}</TableCell>
-                        <TableCell>
-                          {record.student.fullName}
-                        </TableCell>
-                        <TableCell>{record.student.class?.name || '-'}</TableCell>
-                        <TableCell>{record.prayerTime.name}</TableCell>
-                        <TableCell>{getStatusBadge(record.status)}</TableCell>
+              {viewType === 'list' ? (
+                <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableHeader>Tarih</TableHeader>
+                        <TableHeader>Öğrenci</TableHeader>
+                        <TableHeader>Sınıf</TableHeader>
+                        <TableHeader>Vakit</TableHeader>
+                        <TableHeader>Durum</TableHeader>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHead>
+                    <TableBody>
+                      {stats.records?.map((record: any) => (
+                        <TableRow key={record.id}>
+                          <TableCell>{formatTRDate(record.date)}</TableCell>
+                          <TableCell>
+                            {record.student.fullName}
+                          </TableCell>
+                          <TableCell>{record.student.class?.name || '-'}</TableCell>
+                          <TableCell>{record.prayerTime.name}</TableCell>
+                          <TableCell>{getStatusBadge(record.status)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className={styles.karneGrid}>
+                  {stats.groupedRecords?.map((group: any) => (
+                    <Card key={group.student.id} className={styles.studentKarneCard}>
+                      <div className={styles.karneHeader}>
+                        <div className={styles.studentInfo}>
+                          <h3>{group.student.fullName}</h3>
+                          <p>{group.student.class?.name || 'Sınıf Belirtilmemiş'}</p>
+                        </div>
+                        <div className={styles.karneBadges}>
+                          {group.yokCount > 0 && <Badge variant="danger">{group.yokCount} YOK</Badge>}
+                          {group.gecCount > 0 && <Badge variant="delay">{group.gecCount} GEÇ</Badge>}
+                        </div>
+                      </div>
+                      <div className={styles.karneDetails}>
+                        {group.records.map((r: any) => (
+                          <div key={r.id} className={styles.karneRecord}>
+                            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                              <span className={styles.recordDate}>{formatTRDate(r.date)}</span>
+                              <span className={styles.recordPrayer}>{r.prayerTime.name}</span>
+                            </div>
+                            {getStatusBadge(r.status)}
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </>

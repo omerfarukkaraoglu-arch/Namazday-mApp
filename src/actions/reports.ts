@@ -183,11 +183,42 @@ export async function getReportStats(filters: {
     };
   }
 
+  // Gruplanmış Kayıtlar (Karne Görünümü İçin)
+  const studentMap = new Map<string, any>();
+
+  filteredRecords.forEach(record => {
+    const sId = record.student.id;
+    if (!studentMap.has(sId)) {
+      studentMap.set(sId, {
+        student: record.student,
+        yokCount: 0,
+        gecCount: 0,
+        records: []
+      });
+    }
+    const sData = studentMap.get(sId);
+    if (record.status === 'YOK') sData.yokCount++;
+    if (record.status === 'GEC') sData.gecCount++;
+    sData.records.push({
+      id: record.id,
+      date: record.date,
+      prayerTime: record.prayerTime,
+      status: record.status
+    });
+  });
+
+  const groupedRecords = Array.from(studentMap.values()).sort((a, b) => {
+    const totalA = a.yokCount + a.gecCount;
+    const totalB = b.yokCount + b.gecCount;
+    return totalB - totalA;
+  });
+
   return {
     pieData,
     trendData,
     totalRecords: filteredRecords.length,
     records: filteredRecords,
+    groupedRecords,
     studentHistory,
     absenteeismSummary,
     prayerTimes: prayerTimesList

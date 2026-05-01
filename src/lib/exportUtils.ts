@@ -196,3 +196,104 @@ export const exportToPDF = (data: any[], fileName: string, title: string, option
 
   doc.save(`${fileName}.pdf`);
 };
+
+// Karne (Grouped) PDF Export
+export const exportKarnePDF = (groupedData: any[], fileName: string, title: string, options?: PDFOptions) => {
+  const doc = new jsPDF();
+  
+  try {
+    doc.addFileToVFS('Geist-Regular.ttf', GEIST_REGULAR_BASE64);
+    doc.addFont('Geist-Regular.ttf', 'Geist', 'normal');
+    doc.addFont('Geist-Regular.ttf', 'Geist', 'bold');
+    doc.setFont('Geist');
+  } catch (e) {
+    console.error('Font load error:', e);
+  }
+
+  const trFix = (str: string) => str || '';
+  let currentY = 20;
+
+  // Header
+  if (options?.institutionLogo) {
+    try { doc.addImage(options.institutionLogo, 'PNG', 14, 10, 18, 18); } catch (e) {}
+  }
+  
+  doc.setFontSize(20);
+  doc.setTextColor(30, 58, 95);
+  doc.setFont('Geist', 'bold');
+  doc.text(trFix(options?.institutionName || 'NAMAZDAYIM'), options?.institutionLogo ? 36 : 14, 22);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.setFont('Geist', 'normal');
+  doc.text(trFix('Yoklama Analiz ve Karne Raporu'), options?.institutionLogo ? 36 : 14, 28);
+  
+  doc.setDrawColor(226, 232, 240);
+  doc.line(14, 35, 196, 35);
+  
+  currentY = 45;
+  doc.setFontSize(14);
+  doc.setTextColor(30, 41, 59);
+  doc.setFont('Geist', 'bold');
+  doc.text(trFix(title), 14, currentY);
+  
+  doc.setFontSize(9);
+  doc.setTextColor(148, 163, 184);
+  doc.setFont('Geist', 'normal');
+  doc.text(trFix(`Rapor Oluşturulma: ${formatTRDate(new Date())}`), 14, currentY + 7);
+  
+  currentY += 20;
+
+  // Render each student as a section
+  groupedData.forEach((group, index) => {
+    // Check for page break
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    // Student Header Card
+    doc.setFillColor(241, 245, 249);
+    doc.rect(14, currentY, 182, 10, 'F');
+    
+    doc.setFontSize(11);
+    doc.setTextColor(15, 23, 42);
+    doc.setFont('Geist', 'bold');
+    doc.text(trFix(`${group.student.fullName} (${group.student.class?.name || '-'})`), 18, currentY + 7);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(231, 76, 60);
+    doc.text(trFix(`YOK: ${group.yokCount}`), 140, currentY + 7);
+    doc.setTextColor(243, 156, 18);
+    doc.text(trFix(`GEÇ: ${group.gecCount}`), 165, currentY + 7);
+
+    currentY += 10;
+
+    // Student Records Table
+    const tableRows = group.records.map((r: any) => [
+      formatTRDate(r.date),
+      trFix(r.prayerTime.name),
+      trFix(STATUS_LABELS[r.status] || r.status)
+    ]);
+
+    autoTable(doc, {
+      startY: currentY,
+      head: [["Tarih", "Vakit", "Durum"]],
+      body: tableRows,
+      theme: 'plain',
+      margin: { left: 14, right: 14 },
+      styles: { font: 'Geist', fontSize: 9 },
+      headStyles: { fillColor: [248, 250, 252], textColor: [100, 116, 139], fontStyle: 'bold' },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 80 },
+        2: { cellWidth: 62, halign: 'center' }
+      },
+      didDrawPage: (data) => { currentY = data.cursor?.y || currentY; }
+    });
+
+    currentY += 10; // Space between students
+  });
+
+  doc.save(`${fileName}.pdf`);
+};
