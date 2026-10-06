@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db';
 import { getUserContext } from '@/lib/auth-server';
+import { hasAdminPrivileges } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import * as XLSX from 'xlsx';
 
@@ -126,7 +127,7 @@ export async function toggleStudentStatus(id: string, currentStatus: boolean) {
 
 export async function bulkImportStudents(csvText: string) {
   const user = await getUserContext();
-  if (!user || (!['SUPER_ADMIN', 'SYSTEM_ADMIN', 'admin'].includes(user.role.toUpperCase()))) {
+  if (!user || !hasAdminPrivileges(user)) {
     return { error: 'Yetkisiz işlem.' };
   }
 
@@ -206,25 +207,46 @@ export async function getStudentDetails(id: string) {
 
 export async function deleteStudents(ids: string[]) {
   const user = await getUserContext();
-  if (!user || (!['SUPER_ADMIN', 'SYSTEM_ADMIN', 'admin'].includes(user.role.toUpperCase()))) {
-    return { error: 'Yetkisiz işlem.' };
+  if (!user || !hasAdminPrivileges(user)) {
+    return { error: 'Yetkisiz işlem. Öğrenci silme yetkiniz bulunmuyor.' };
+  }
+
+  if (!ids || ids.length === 0) {
+    return { error: 'Silinecek öğrenci seçilmedi.' };
   }
 
   try {
-    await prisma.student.deleteMany({
-      where: { id: { in: ids }, institutionId: user.institutionId }
+    await prisma.$transaction(async (tx) => {
+      // 1. Öğrencilere ait tüm yoklama kayıtlarını sil
+      await tx.attendance.deleteMany({
+        where: {
+          studentId: { in: ids },
+          institutionId: user.institutionId
+        }
+      });
+
+      // 2. Öğrencileri sil
+      await tx.student.deleteMany({
+        where: {
+          id: { in: ids },
+          institutionId: user.institutionId
+        }
+      });
     });
+
     revalidatePath('/ogrenciler');
+    revalidatePath('/raporlar');
+    revalidatePath('/dashboard');
     return { success: true };
   } catch (error) {
     console.error('Bulk delete error:', error);
-    return { error: 'Silme işlemi sırasında hata oluştu. Bazı öğrencilerin silinmesi kısıtlanmış olabilir.' };
+    return { error: 'Silme işlemi sırasında bir hata oluştu.' };
   }
 }
 
 export async function bulkToggleStudentStatus(ids: string[], targetStatus: boolean) {
   const user = await getUserContext();
-  if (!user || (!['SUPER_ADMIN', 'SYSTEM_ADMIN', 'admin'].includes(user.role.toUpperCase()))) {
+  if (!user || !hasAdminPrivileges(user)) {
     return { error: 'Yetkisiz işlem.' };
   }
 
@@ -243,7 +265,7 @@ export async function bulkToggleStudentStatus(ids: string[], targetStatus: boole
 
 export async function bulkImportStudentsFromExcel(base64Data: string) {
   const user = await getUserContext();
-  if (!user || (!['SUPER_ADMIN', 'SYSTEM_ADMIN', 'admin'].includes(user.role.toUpperCase()))) {
+  if (!user || !hasAdminPrivileges(user)) {
     return { error: 'Yetkisiz işlem.' };
   }
 
