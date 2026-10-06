@@ -263,3 +263,23 @@
   gap: 1rem;
   margin-top: 1rem;
 }
+
+.deleteBtn {
+  color: #ef4444;
+}
+
+.deleteBtn:hover {
+  background: #fef2f2;
+}
+
+.badgeCurrent {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}

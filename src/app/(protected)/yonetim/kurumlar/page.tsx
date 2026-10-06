@@ -18,5 +18,10 @@ export default async function InstitutionsPage() {
 
   const institutions = await getInstitutions();
 
-  return <InstitutionsClient initialData={JSON.parse(JSON.stringify(institutions))} />;
+  return (
+    <InstitutionsClient 
+      initialData={JSON.parse(JSON.stringify(institutions))} 
+      currentInstitutionId={user.institutionId}
+    />
+  );
 }

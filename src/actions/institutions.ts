@@ -107,3 +107,46 @@ export async function updateInstitution(id: string, data: { name?: string, logo?
     return { error: 'Güncelleme sırasında bir hata oluştu.' };
   }
 }
+
+export async function deleteInstitution(id: string) {
+  const user = await getUserContext();
+  if (!user || (!checkRole(user.role, 'SYSTEM_ADMIN') && !isVIPAdmin(user))) {
+    return { error: 'Yetkisiz işlem. Kurumları sadece Süper Admin silebilir.' };
+  }
+
+  if (user.institutionId === id) {
+    return { error: 'Aktif olarak bağlı olduğunuz kendi kurumunuzu silemezsiniz.' };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // 1. Yoklamalar
+      await tx.attendance.deleteMany({ where: { institutionId: id } });
+      // 2. Bildirimler
+      await tx.notification.deleteMany({ where: { institutionId: id } });
+      // 3. Öğrenciler
+      await tx.student.deleteMany({ where: { institutionId: id } });
+      // 4. Kullanıcılar
+      await tx.user.deleteMany({ where: { institutionId: id } });
+      // 5. Sınıflar
+      await tx.class.deleteMany({ where: { institutionId: id } });
+      // 6. Kademeler
+      await tx.level.deleteMany({ where: { institutionId: id } });
+      // 7. Kategoriler
+      await tx.category.deleteMany({ where: { institutionId: id } });
+      // 8. Vakitler
+      await tx.prayerTime.deleteMany({ where: { institutionId: id } });
+      // 9. Kurum
+      await tx.institution.delete({ where: { id } });
+    });
+
+    revalidatePath('/yonetim/kurumlar');
+    revalidatePath('/yonetim/ayarlar/kurum');
+    revalidatePath('/', 'layout');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Delete institution error:', error);
+    return { error: 'Kurum ve bağlı verileri silinirken bir hata oluştu.' };
+  }
+}

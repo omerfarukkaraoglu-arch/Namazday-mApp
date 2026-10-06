@@ -4,8 +4,8 @@ import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Plus, Building2, Power, Users, Edit2, X, Upload } from 'lucide-react';
-import { createInstitution, toggleInstitutionStatus, updateInstitution } from '@/actions/institutions';
+import { Plus, Building2, Power, Users, Edit2, X, Upload, Trash2 } from 'lucide-react';
+import { createInstitution, toggleInstitutionStatus, updateInstitution, deleteInstitution } from '@/actions/institutions';
 import styles from './Institutions.module.css';
 
 interface Institution {
@@ -20,7 +20,13 @@ interface Institution {
   };
 }
 
-export default function InstitutionsClient({ initialData }: { initialData: Institution[] }) {
+export default function InstitutionsClient({ 
+  initialData, 
+  currentInstitutionId 
+}: { 
+  initialData: Institution[];
+  currentInstitutionId?: string;
+}) {
   const [institutions, setInstitutions] = useState(initialData);
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState('');
@@ -58,6 +64,34 @@ export default function InstitutionsClient({ initialData }: { initialData: Insti
         inst.id === id ? { ...inst, isActive: !currentStatus } : inst
       ));
     }
+  };
+
+  const handleDelete = async (inst: Institution) => {
+    if (currentInstitutionId && inst.id === currentInstitutionId) {
+      alert('Aktif olarak bağlı olduğunuz kendi kurumunuzu silemezsiniz.');
+      return;
+    }
+
+    const confirmText = prompt(
+      `DİKKAT: "${inst.name}" kurumunu ve bu kuruma bağlı TÜM kullanıcı, öğrenci, sınıf ve yoklama kayıtlarını kalıcı olarak silmek üzeresiniz.\n\nOnaylamak için kurumun adını ("${inst.name}") aşağıya yazınız:`
+    );
+
+    if (confirmText?.trim() !== inst.name.trim()) {
+      if (confirmText !== null) {
+        alert('Kurum adı eşleşmediği için silme işlemi iptal edildi.');
+      }
+      return;
+    }
+
+    setLoading(true);
+    const result = await deleteInstitution(inst.id);
+    if (result.success) {
+      setInstitutions(prev => prev.filter(i => i.id !== inst.id));
+      alert(`"${inst.name}" kurumu ve bağlı tüm veriler başarıyla silindi.`);
+    } else {
+      alert(result.error);
+    }
+    setLoading(false);
   };
 
   const openEdit = (inst: Institution) => {
@@ -224,9 +258,14 @@ export default function InstitutionsClient({ initialData }: { initialData: Insti
                 </div>
                 <div className={styles.instMainInfo}>
                   <h3>{inst.name}</h3>
-                  <span className={inst.isActive ? styles.badgeActive : styles.badgeInactive}>
-                    {inst.isActive ? 'Aktif' : 'Pasif'}
-                  </span>
+                  <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span className={inst.isActive ? styles.badgeActive : styles.badgeInactive}>
+                      {inst.isActive ? 'Aktif' : 'Pasif'}
+                    </span>
+                    {currentInstitutionId === inst.id && (
+                      <span className={styles.badgeCurrent}>Mevcut Kurumunuz</span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -259,6 +298,19 @@ export default function InstitutionsClient({ initialData }: { initialData: Insti
                   <Power size={14} />
                   <span>{inst.isActive ? 'Durum Değiştir' : 'Aktif Et'}</span>
                 </Button>
+                {currentInstitutionId !== inst.id && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleDelete(inst)}
+                    className={styles.deleteBtn}
+                    disabled={loading}
+                    title="Kurumu ve Verilerini Sil"
+                  >
+                    <Trash2 size={14} />
+                    <span>Sil</span>
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
